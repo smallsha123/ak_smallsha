@@ -111,7 +111,7 @@ if(!function_exists('baseSerialize')){
 	function generate_rand_string( $length = 8 ) { 
 		// 密码字符集，可任意添加你需要的字符 
 		$chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; 
-		$password = ”; 
+		$password = ''; 
 		for ( $i = 0; $i < $length; $i++ ) 
 		{ 
 		// 这里提供两种字符获取方式 
