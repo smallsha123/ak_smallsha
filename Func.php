@@ -130,5 +130,135 @@ if (!function_exists('AkConfig')) {
     }
 }
 
+/**
+ * 冒泡排序
+ *
+ * @author   smallsha <2233850112@qq.com>
+ * @date     2017/6/16
+ * @license  MIT
+ * -------------------------------------------------------------
+ * 思路分析：就是像冒泡一样，每次从数组当中 冒一个最大的数出来。 
+ * -------------------------------------------------------------
+ * 你可以这样理解：（从小到大排序）存在10个不同大小的气泡，
+ * 由底至上的把较少的气泡逐步地向上升，这样经过遍历一次后最小的气泡就会被上升到顶（下标为0）
+ * 然后再从底至上地这样升，循环直至十个气泡大小有序。
+ * 在冒泡排序中，最重要的思想是两两比较，将两者较少的升上去
+ *
+ */
+// +--------------------------------------------------------------------------
+// | 解题方式    | 这儿，可能有用的解决方案
+// +--------------------------------------------------------------------------
+/**
+ * BubbleSort
+ *
+ * @param array $container
+ * @return array
+ */
+ if(! function_exists ('BubbleSort')) {
+	 function BubbleSort(array $container)
+		{
+			$count = count($container);
+			for ($j = 1; $j < $count; $j++) {
+				for ($i = 0; $i < $count - $j; $i++) {
+					if ($container[$i] > $container[$i + 1]) {
+						$temp = $container[$i];
+						$container[$i] = $container[$i + 1];
+						$container[$i + 1] = $temp;
+					}
+				}
+			}
+			return $container;
+		}
+}
+
+
+
+/**
+ * 插入排序
+ * @author   smallsha <2233850112@qq.com>
+ * @date     2017/6/17
+ * @license  MIT
+ * -------------------------------------------------------------
+ * 思路分析：每步将一个待排序的纪录，按其关键码值的大小插入前面已经排序的文件中适当位置上，直到全部插入完为止。
+ * -------------------------------------------------------------
+ *
+ * 算法适用于少量数据的排序，时间复杂度为O(n^2)。是稳定的排序方法。
+ * 插入算法把要排序的数组分成两部分：第一部分包含了这个数组的所有元素，
+ * 但将最后一个元素除外（让数组多一个空间才有插入的位置），而第二部分就只包含这一个元素（即待插入元素）。
+ * 在第一部分排序完成后，再将这个最后元素插入到已排好序的第一部分中。
+ *
+ */
+// +--------------------------------------------------------------------------
+// | 解题方式    | 这儿，可能有用的解决方案
+// +--------------------------------------------------------------------------
+/**
+ * InsertSort
+ *
+ * @param array $container
+ * @return array
+ */
+if(! function_exists ('InsertSort')) {
+		function InsertSort(array $container)
+		{
+			$count = count($container);
+			for ($i = 1; $i < $count; $i++){
+				$temp = $container[$i];
+				$j    = $i - 1;
+				// Init
+				while($j >= 0 && $container[$j] > $temp){
+					$container[$j+1] = $container[$j];
+					$j--;
+				}
+				if($i != $j+1) 
+					$container[$j+1] = $temp;
+			}
+			return $container;
+		}
+}
+
+/**
+ * 快速排序
+ *
+ * @author  smallsha <2233850112@qq.com>
+ * @date     2017/6/17
+ * @license  MIT
+ * -------------------------------------------------------------
+ * 思路分析：从数列中挑出一个元素，称为 “基准”（pivot) 
+ * 大O表示： O(n log n) 最糟 O(n 2)
+ * -------------------------------------------------------------
+ * 重新排序数列，所有元素比基准值小的摆放在基准前面，C 语言中的 qsort就是快速排序
+ * 所有元素比基准值大的摆在基准的后面（相同的数可以到任一边）。
+ * 递归地（recursive）把小于基准值元素的子数列和大于基准值元素的子数列排序
+ */
+// +--------------------------------------------------------------------------
+// | 解题方式
+// +--------------------------------------------------------------------------
+/**
+ * QuickSort
+ *
+ * @param array $container
+ * @return array
+ */
+ if(! function_exists (QuickSort)) {
+		function QuickSort(array $container)
+		{
+			$count = count($container);
+			if ($count <= 1) { // 基线条件为空或者只包含一个元素，只需要原样返回数组
+				return $container;
+			}
+			$pivot = $container[0]; // 基准值 pivot
+			$left  = $right = [];
+			for ($i = 1; $i < $count; $i++) {
+				if ($container[$i] < $pivot) {
+					$left[] = $container[$i];
+				} else {
+					$right[] = $container[$i];
+				}
+			}
+			$left  = QuickSort($left);
+			$right = QuickSort($right);
+			return array_merge($left, [$container[0]], $right);
+		}
+ }
 
  
