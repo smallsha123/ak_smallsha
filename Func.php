@@ -239,7 +239,7 @@ if(! function_exists ('InsertSort')) {
  * @param array $container
  * @return array
  */
- if(! function_exists (QuickSort)) {
+ if(! function_exists ('QuickSort')) {
 		function QuickSort(array $container)
 		{
 			$count = count($container);
@@ -260,5 +260,12 @@ if(! function_exists ('InsertSort')) {
 			return array_merge($left, [$container[0]], $right);
 		}
  }
+
+if(! function_exists('XmltoArray')){
+     function XmltoArray($data) {
+         $data = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
+         return json_decode(json_encode($data),true);
+     }
+}
 
  
