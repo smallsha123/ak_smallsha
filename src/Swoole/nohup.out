@@ -1,0 +1,18 @@
+[2018-05-21 11:54:56 *18191.0]	WARNING	swSignalfd_onSignal: signal[1] callback is null.
+[2018-05-21 11:54:56 $18188.0]	WARNING	swSignal_callback: signal[1] callback is null.
+[2018-05-21 11:54:56 #18187.1]	WARNING	swSignalfd_onSignal: signal[1] callback is null.
+15/1 [x] Sent 'Hello World!###/.'
+2312/3456 [x] Sent 'Hello World!###/.'
+45 [x] Sent 'Hello World!###/.'
+ [x] Sent 'Hello World!###/.'
+ [x] Sent 'Hello World!###/.'
+exit system[2018-05-21 11:58:40 *18191.0]	NOTICE	swFactoryProcess_end (ERROR 1003): The connection[5] is closing.
+6456 [x] Sent 'Hello World!###/.'
+78913/9 [x] Sent 'Hello World!###/.'
+105/1011456 [x] Sent 'Hello World!###/.'
+456 [x] Sent 'Hello World!###/.'
+12exit system[2018-05-21 12:01:45 *18191.0]	NOTICE	swFactoryProcess_end (ERROR 1003): The connection[12] is closing.
+13 [x] Sent 'Hello World!###/.'
+exit system[2018-05-22 16:10:17 *18191.0]	NOTICE	swFactoryProcess_end (ERROR 1003): The connection[13] is closing.
+1415 [x] Sent 'Hello World!###/.'
+16
