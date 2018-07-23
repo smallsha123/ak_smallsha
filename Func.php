@@ -397,3 +397,5 @@ function getDistance( $longitude1 , $latitude1 , $longitude2 , $latitude2 , $uni
     return round( $distance , $decimal );
 }
 //echo getDistance(113.625368 , 34.7466 , 113.76985, 34.76984);
+
+
