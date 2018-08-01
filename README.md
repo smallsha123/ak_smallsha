@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /**
  *
  * ━━━━━━神兽出没━━━━━━
@@ -22,7 +21,7 @@
  *
  * ━━━━━━感觉萌萌哒━━━━━━
  */
-=======
+
 # ak_smallsha
 
 #### 项目介绍
@@ -60,4 +59,4 @@ php 集成包，封装了常用的类库，任何框架中都可以使用
 4. [GVP](https://gitee.com/gvp) 全称是码云最有价值开源项目，是码云综合评定出的优秀开源项目
 5. 码云官方提供的使用手册 [http://git.mydoc.io/](http://git.mydoc.io/)
 6. 码云封面人物是一档用来展示码云会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
->>>>>>> origin/master
+

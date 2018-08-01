@@ -573,4 +573,127 @@ if(!function_exists('get_url_video')){
 
 
 
+/*
+ * array转xml
+ * @param is_dep false 针对的是浅层数组  true 针对深层数组
+ * */
+if(!function_exists('ArraytoXml')){
+    function ArraytoXml($data,$is_dep = false){
+        if(!is_array($data)){
+            return false;
+        }
+        if($is_dep == false){
+            $xml = "<xml>";
+            foreach ($data as $key=>$val){
+                if (is_numeric($val)){
+                    $xml.="<".$key.">".$val."</".$key.">";
+                }else{
+                    $xml.="<".$key."><![CDATA[".$val."]]></".$key.">";
+                }
+            }
+            $xml.="</xml>";
+            return $xml;
+
+        }else{
+            return arr2xml($data);
+        }
+    }
+}
+
+/*
+ * 深层array转xml
+ * */
+if(!function_exists('arr2xml')){
+    function arr2xml($data, $root = true){
+        $str="";
+        if($root)$str .= "<xml>";
+        foreach($data as $key => $val){
+            if(is_array($val)){
+                $child = arr2xml($val, false);
+                $str .= "<$key>$child</$key>";
+            }else{
+                $str.= "<$key><![CDATA[$val]]></$key>";
+            }
+        }
+        if($root)$str .= "</xml>";
+        return $str;
+    }
+
+}
+
+/**
+ * 将xml转为array
+ * @param  string   $xml xml字符串或者xml文件名
+ * @param  bool     $isfile 传入的是否是xml文件名
+ * @return array    转换得到的数组
+ */
+function xmlToArray($xml,$isfile=false){
+    //禁止引用外部xml实体
+    libxml_disable_entity_loader(true);
+    if($isfile){
+        if(!file_exists($xml)) return false;
+        $xmlstr = file_get_contents($xml);
+    }else{
+        $xmlstr = $xml;
+    }
+    $result= json_decode(json_encode(simplexml_load_string($xmlstr, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
+    return $result;
+}
+
+
+/**
+ * 数组转xml字符
+ * @param  string   $xml xml字符串
+ **/
+function arrayToXml($data)
+{
+    if (!is_array($data) || count($data) <= 0) {
+        return false;
+    }
+    $xml = "<xml>";
+    foreach ($data as $key => $val) {
+        if (is_numeric($val)) {
+            $xml .= "<" . $key . ">" . $val . "</" . $key . ">";
+        } else {
+            $xml .= "<" . $key . "><![CDATA[" . $val . "]]></" . $key . ">";
+        }
+    }
+    $xml .= "</xml>";
+    return $xml;
+
+}
+    /**
+ * 计算两点地理坐标之间的距离
+ * @param  float $longitude1 起点经度
+ * @param  float $latitude1 起点纬度
+ * @param  float $longitude2 终点经度
+ * @param  float $latitude2 终点纬度
+ * @param  Int $unit 单位 1:米 2:公里
+ * @param  Int $decimal 精度 保留小数位数
+ * @return float
+ */
+function getDistance( $longitude1 , $latitude1 , $longitude2 , $latitude2 , $unit = 2 , $decimal = 2 ) {
+    $EARTH_RADIUS = 6370.996; // 地球半径系数
+    $PI = 3.1415926;
+
+    $radLat1 = $latitude1 * $PI / 180.0;
+    $radLat2 = $latitude2 * $PI / 180.0;
+
+    $radLng1 = $longitude1 * $PI / 180.0;
+    $radLng2 = $longitude2 * $PI / 180.0;
+
+    $a = $radLat1 - $radLat2;
+    $b = $radLng1 - $radLng2;
+
+    $distance = 2 * asin( sqrt( pow( sin( $a / 2 ) , 2 ) + cos( $radLat1 ) * cos( $radLat2 ) * pow( sin( $b / 2 ) , 2 ) ) );
+    $distance = $distance * $EARTH_RADIUS * 1000;
+
+    if( $unit == 2 ) {
+        $distance = $distance / 1000;
+    }
+
+    return round( $distance , $decimal );
+}
+//echo getDistance(113.625368 , 34.7466 , 113.76985, 34.76984);
+
 
