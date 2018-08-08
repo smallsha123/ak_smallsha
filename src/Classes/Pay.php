@@ -3,11 +3,19 @@ namespace  Smallsha\Classes;
 
 class Pay{
     const QUERY_ORDER =  'https://api.mch.weixin.qq.com/pay/orderquery';
-	function __construct(){
-		$this->appid='wx8b3d2b12a1eb513f';
-		$this->appsecret='78bb0796372fc7d51e2207fa7422482b';
-		$this->mkey='qazwsxedcrfvtgbyhnujmikolpqazwsx';
-		$this->mch_id='10013306';
+
+	public function __construct($pay_param = ''){
+//		$this->appid='wx8b3d2b12a1eb513f';
+//		$this->appsecret='78bb0796372fc7d51e2207fa7422482b';
+//      $this->mkey='qazwsxedcrfvtgbyhnujmikolpqazwsx';
+//		$this->mch_id='10013306';
+        $this->appid=$pay_param['appid'];
+		$this->appsecret=$pay_param['appsecret'];
+
+		$this->mkey=$pay_param['mkey'];
+
+		$this->mch_id=$pay_param['mchid'];
+
 		
 	}
 
@@ -53,7 +61,7 @@ class Pay{
                <out_trade_no>".$this->params['out_trade_no']."</out_trade_no>
                <sign>".$this->sign."</sign>
             </xml>";
-            $result = sm_request(self::QUERY_ORDER,$data);//dump($result);
+            $result = sm_request(self::QUERY_ORDER,$data);
             $postObj = simplexml_load_string($result, 'SimpleXMLElement', LIBXML_NOCDATA);
             $response = json_decode(json_encode($postObj),true);
             return $response;

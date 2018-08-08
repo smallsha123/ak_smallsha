@@ -1,4 +1,43 @@
 <?php
+
+//使用ak_smallsha默认自定义记载func
+function choose_bind_func( $filename = '', $is_all = false )
+{
+    $rest_dir = __DIR__ . '/src/Function';
+    if ($is_all) {
+        getAkFunc(); // 自动加载到Function中全部方法
+    } else {
+        $file_dir = $rest_dir . '/' . $filename . '.php';
+        if (is_file($file_dir)) {
+            require_once $file_dir;
+        } else {
+            trigger_error($file_dir . '文件不存在', E_USER_WARNING); //E_USER_ERROR E_USER_WARNING  E_USER_NOTICE //默认
+        }
+    }
+
+
+}
+
+
+function getAkFunc()
+{
+    $handle = opendir(__DIR__ . '/src/Function');
+    if (!empty($handle)) {
+        while ($dir = readdir($handle)) {
+            if ($dir != '.' && $dir != '..') {
+                $files[] = $dir;
+            }
+        }
+    }
+    foreach ($files as $v) {
+        $file_dir = __DIR__ . '/src/Function/' . $v;
+        if (is_file($file_dir)) {
+            require_once $file_dir;
+        }
+    }
+
+}
+
 /**
  * 是否是AJAx提交的
  * @return bool
@@ -276,8 +315,8 @@ if (!function_exists('QuickSort')) {
     }
 }
 
-if (!function_exists('XmltoArray')) {
-    function XmltoArray( $data )
+if (!function_exists('xml_to_array')) {
+    function xml_to_array( $data )
     {
         $data = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
         return json_decode(json_encode($data), true);
@@ -291,13 +330,25 @@ function sm_request( $url, $data = null )
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
     curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
+//    curl_setopt($curl, CURLOPT_HEADER, TRUE);    //表示需要response header
+    curl_setopt($curl, CURLOPT_NOBODY, FALSE);  //表示需要response body
+//    curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
+    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, FALSE);
+    curl_setopt($curl, CURLOPT_AUTOREFERER, TRUE);
+    curl_setopt($curl, CURLOPT_TIMEOUT, 120);
     if (!empty($data)) {
         curl_setopt($curl, CURLOPT_POST, 1);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
     }
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     $output = curl_exec($curl);
+    if (curl_getinfo($curl, CURLINFO_HTTP_CODE) == '200') {
+        $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
+        $header = substr($output, 0, $headerSize);
+        $body = substr($output, $headerSize);
+    }
     //var_dump(curl_error($curl));
+
     curl_close($curl);
     return $output;
 }
@@ -379,15 +430,16 @@ if (!function_exists('rmdirs')) {
     }
 }
 
-if (!function_exists('getips')){
+if (!function_exists('getips')) {
     //获取客户端ip
-    function getips() {
+    function getips()
+    {
 
         static $ip = '';
 
         $ip = $_SERVER['REMOTE_ADDR'];
 
-        if(isset($_SERVER['HTTP_CDN_SRC_IP'])) {
+        if (isset($_SERVER['HTTP_CDN_SRC_IP'])) {
 
             $ip = $_SERVER['HTTP_CDN_SRC_IP'];
 
@@ -395,7 +447,7 @@ if (!function_exists('getips')){
 
             $ip = $_SERVER['HTTP_CLIENT_IP'];
 
-        } elseif(isset($_SERVER['HTTP_X_FORWARDED_FOR']) && preg_match_all('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#s', $_SERVER['HTTP_X_FORWARDED_FOR'], $matches)) {
+        } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && preg_match_all('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#s', $_SERVER['HTTP_X_FORWARDED_FOR'], $matches)) {
 
             foreach ($matches[0] AS $xip) {
 
@@ -424,82 +476,19 @@ if (!function_exists('getips')){
     }
 }
 
-if(!function_exists('get_time')){
+if (!function_exists('get_time')) {
     //获取系统时间 优于time()
-    function get_time($is_format = false){
-        return  $is_format ?  date('Y-m-d H:i:s',$_SERVER['REQUEST_TIME']) :  $_SERVER['REQUEST_TIME'];
+    function get_time( $is_format = false )
+    {
+        return $is_format ? date('Y-m-d H:i:s', $_SERVER['REQUEST_TIME']) : $_SERVER['REQUEST_TIME'];
     }
 }
 
-if(!function_exists('logging')){
 
-    function logging($level = 'info', $message = '',$filename='smallsha') {
+if (!function_exists('random')) {
 
-        $filename =  IA_ROOT . '/data/logs/smallsha/' .date('Ymd').$filename. '.log';
-
-
-        mkdirs(dirname($filename));
-
-        $content = date('Y-m-d H:i:s') . " {$level} :\n------------\n";
-
-        if(is_string($message) && !in_array($message, array('post', 'get'))) {
-
-            $content .= "String:\n{$message}\n";
-
-        }
-
-        if(is_array($message)) {
-
-            $content .= "Array:\n";
-
-            foreach($message as $key => $value) {
-
-                $content .= sprintf("%s : %s ;\n", $key, $value);
-
-            }
-
-        }
-
-        if($message === 'get') {
-
-            $content .= "GET:\n";
-
-            foreach($_GET as $key => $value) {
-
-                $content .= sprintf("%s : %s ;\n", $key, $value);
-
-            }
-
-        }
-
-        if($message === 'post') {
-
-            $content .= "POST:\n";
-
-            foreach($_POST as $key => $value) {
-
-                $content .= sprintf("%s : %s ;\n", $key, $value);
-
-            }
-
-        }
-
-        $content .= "\n";
-
-
-
-        $fp = fopen($filename, 'a+');
-
-        fwrite($fp, $content);
-
-        fclose($fp);
-
-    }
-}
-
-if(!function_exists('random')){
-
-    function random($length, $numeric = FALSE) {
+    function random( $length, $numeric = FALSE )
+    {
 
         $seed = base_convert(md5(microtime() . $_SERVER['DOCUMENT_ROOT']), 16, $numeric ? 10 : 35);
 
@@ -531,70 +520,69 @@ if(!function_exists('random')){
 }
 
 
-if(!function_exists('timeFromNow')){
-    function timeFromNow($dateline) {
-        if(empty($dateline)) return false;
+if (!function_exists('timeFromNow')) {
+    function timeFromNow( $dateline )
+    {
+        if (empty($dateline)) return false;
         $seconds = time() - $dateline;
-        if ($seconds < 60){
+        if ($seconds < 60) {
             return "1分钟前";
-        }elseif($seconds < 3600){
-            return floor($seconds/60)."分钟前";
-        }elseif($seconds  < 24*3600){
-            return floor($seconds/3600)."小时前";
-        }elseif($seconds < 48*3600){
-            return date("昨天 H:i", $dateline)."";
-        }else{
+        } elseif ($seconds < 3600) {
+            return floor($seconds / 60) . "分钟前";
+        } elseif ($seconds < 24 * 3600) {
+            return floor($seconds / 3600) . "小时前";
+        } elseif ($seconds < 48 * 3600) {
+            return date("昨天 H:i", $dateline) . "";
+        } else {
             return date('Y-m-d', $dateline);
         }
     }
 }
 
-if(!function_exists('get_url_video')){
-    function get_url_video($video){
-        $vid=trim(strrchr($video, '/'),'/');
-        $vid=substr($vid,0,-5);
-        $json=file_get_contents("http://vv.video.qq.com/getinfo?vids=".$vid."&platform=101001&charge=0&otype=json");
+if (!function_exists('get_url_video')) {
+    function get_url_video( $video )
+    {
+        $vid = trim(strrchr($video, '/'), '/');
+        $vid = substr($vid, 0, -5);
+        $json = file_get_contents("http://vv.video.qq.com/getinfo?vids=" . $vid . "&platform=101001&charge=0&otype=json");
 //             echo $json;die;
-        $json=substr($json,13);
-        $json=substr($json,0,-1);
-        $a=json_decode(html_entity_decode($json));
-        $sz=json_decode(json_encode($a),true);
+        $json = substr($json, 13);
+        $json = substr($json, 0, -1);
+        $a = json_decode(html_entity_decode($json));
+        $sz = json_decode(json_encode($a), true);
         // print_R($sz);die;
-        $url=$sz['vl']['vi']['0']['ul']['ui']['3']['url'];
-        $fn=$sz['vl']['vi']['0']['fn'];
-        $fvkey=$sz['vl']['vi']['0']['fvkey'];
-        $url=$url.$fn.'?vkey='.$fvkey;
-        return  $url;
+        $url = $sz['vl']['vi']['0']['ul']['ui']['3']['url'];
+        $fn = $sz['vl']['vi']['0']['fn'];
+        $fvkey = $sz['vl']['vi']['0']['fvkey'];
+        $url = $url . $fn . '?vkey=' . $fvkey;
+        return $url;
     }
 
 }
-
-
-
-
 
 /*
  * array转xml
  * @param is_dep false 针对的是浅层数组  true 针对深层数组
  * */
-if(!function_exists('ArraytoXml')){
-    function ArraytoXml($data,$is_dep = false){
-        if(!is_array($data)){
+if (!function_exists('array_xml')) {
+    function array_xml( $data, $is_dep = false )
+    {
+        if (!is_array($data)) {
             return false;
         }
-        if($is_dep == false){
+        if ($is_dep == false) {
             $xml = "<xml>";
-            foreach ($data as $key=>$val){
-                if (is_numeric($val)){
-                    $xml.="<".$key.">".$val."</".$key.">";
-                }else{
-                    $xml.="<".$key."><![CDATA[".$val."]]></".$key.">";
+            foreach ($data as $key => $val) {
+                if (is_numeric($val)) {
+                    $xml .= "<" . $key . ">" . $val . "</" . $key . ">";
+                } else {
+                    $xml .= "<" . $key . "><![CDATA[" . $val . "]]></" . $key . ">";
                 }
             }
-            $xml.="</xml>";
+            $xml .= "</xml>";
             return $xml;
 
-        }else{
+        } else {
             return arr2xml($data);
         }
     }
@@ -603,66 +591,48 @@ if(!function_exists('ArraytoXml')){
 /*
  * 深层array转xml
  * */
-if(!function_exists('arr2xml')){
-    function arr2xml($data, $root = true){
-        $str="";
-        if($root)$str .= "<xml>";
-        foreach($data as $key => $val){
-            if(is_array($val)){
+if (!function_exists('arr2xml')) {
+    function arr2xml( $data, $root = true )
+    {
+        $str = "";
+        if ($root) $str .= "<xml>";
+        foreach ($data as $key => $val) {
+            if (is_array($val)) {
                 $child = arr2xml($val, false);
                 $str .= "<$key>$child</$key>";
-            }else{
-                $str.= "<$key><![CDATA[$val]]></$key>";
+            } else {
+                $str .= "<$key><![CDATA[$val]]></$key>";
             }
         }
-        if($root)$str .= "</xml>";
+        if ($root) $str .= "</xml>";
         return $str;
     }
 
 }
 
+
 /**
  * 将xml转为array
- * @param  string   $xml xml字符串或者xml文件名
- * @param  bool     $isfile 传入的是否是xml文件名
+ * @param  string $xml xml字符串或者xml文件名
+ * @param  bool $isfile 传入的是否是xml文件名
  * @return array    转换得到的数组
  */
-function xmlToArray($xml,$isfile=false){
+function xml_array( $xml, $isfile = false )
+{
     //禁止引用外部xml实体
     libxml_disable_entity_loader(true);
-    if($isfile){
-        if(!file_exists($xml)) return false;
+    if ($isfile) {
+        if (!file_exists($xml)) return false;
         $xmlstr = file_get_contents($xml);
-    }else{
+    } else {
         $xmlstr = $xml;
     }
-    $result= json_decode(json_encode(simplexml_load_string($xmlstr, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
+    $result = json_decode(json_encode(simplexml_load_string($xmlstr, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
     return $result;
 }
 
 
 /**
- * 数组转xml字符
- * @param  string   $xml xml字符串
- **/
-function arrayToXml($data)
-{
-    if (!is_array($data) || count($data) <= 0) {
-        return false;
-    }
-    $xml = "<xml>";
-    foreach ($data as $key => $val) {
-        if (is_numeric($val)) {
-            $xml .= "<" . $key . ">" . $val . "</" . $key . ">";
-        } else {
-            $xml .= "<" . $key . "><![CDATA[" . $val . "]]></" . $key . ">";
-        }
-    }
-    $xml .= "</xml>";
-    return $xml;
-
-}
-    /**
  * 计算两点地理坐标之间的距离
  * @param  float $longitude1 起点经度
  * @param  float $latitude1 起点纬度
@@ -672,28 +642,42 @@ function arrayToXml($data)
  * @param  Int $decimal 精度 保留小数位数
  * @return float
  */
-function getDistance( $longitude1 , $latitude1 , $longitude2 , $latitude2 , $unit = 2 , $decimal = 2 ) {
-    $EARTH_RADIUS = 6370.996; // 地球半径系数
-    $PI = 3.1415926;
+if (!function_exists('getDistance')) {
+    function getDistance( $longitude1, $latitude1, $longitude2, $latitude2, $unit = 2, $decimal = 2 )
+    {
+        $EARTH_RADIUS = 6370.996; // 地球半径系数
+        $PI = 3.1415926;
 
-    $radLat1 = $latitude1 * $PI / 180.0;
-    $radLat2 = $latitude2 * $PI / 180.0;
+        $radLat1 = $latitude1 * $PI / 180.0;
+        $radLat2 = $latitude2 * $PI / 180.0;
 
-    $radLng1 = $longitude1 * $PI / 180.0;
-    $radLng2 = $longitude2 * $PI / 180.0;
+        $radLng1 = $longitude1 * $PI / 180.0;
+        $radLng2 = $longitude2 * $PI / 180.0;
 
-    $a = $radLat1 - $radLat2;
-    $b = $radLng1 - $radLng2;
+        $a = $radLat1 - $radLat2;
+        $b = $radLng1 - $radLng2;
 
-    $distance = 2 * asin( sqrt( pow( sin( $a / 2 ) , 2 ) + cos( $radLat1 ) * cos( $radLat2 ) * pow( sin( $b / 2 ) , 2 ) ) );
-    $distance = $distance * $EARTH_RADIUS * 1000;
+        $distance = 2 * asin(sqrt(pow(sin($a / 2), 2) + cos($radLat1) * cos($radLat2) * pow(sin($b / 2), 2)));
+        $distance = $distance * $EARTH_RADIUS * 1000;
 
-    if( $unit == 2 ) {
-        $distance = $distance / 1000;
+        if ($unit == 2) {
+            $distance = $distance / 1000;
+        }
+
+        return round($distance, $decimal);
     }
-
-    return round( $distance , $decimal );
 }
+
 //echo getDistance(113.625368 , 34.7466 , 113.76985, 34.76984);
+
+
+function msectime()
+{
+    list($msec, $sec) = explode(' ', microtime());
+    $msectime = (float)sprintf('%.0f', (floatval($msec) + floatval($sec)) * 1000);
+    return $msectime;
+}
+
+
 
 

@@ -230,6 +230,6 @@ class Page {
     }
 }
 //使用说明：
-//   $page=new \think\Page($count,12);
+//   $page=new \Smallsha\Page($count,12);
 //$oil_name = db('wechat_oli')->field('oliname,id')->where($where)->limit($page->limit)->select();
 //      return $this->fetch('',['oil_name'=>$oil_name,'page'=>$page->fpage()]);
