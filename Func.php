@@ -1,6 +1,6 @@
 <?php
 
-//使用ak_smallsha默认自定义记载func
+//使用ak_smallsha默认自定义加载func
 function choose_bind_func( $filename = '', $is_all = false )
 {
     $rest_dir = __DIR__ . '/src/Function';
