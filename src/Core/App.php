@@ -63,7 +63,7 @@ class App extends \Smallsha\Core\Component {
             ini_set('display_errors',0);
             error_reporting(0);
         }
-
+        ini_set('date.timezone','Asia/Shanghai'); //设置时区
         new \Smallsha\Classes\PluginManager(); //加载插件
         return true;
     }
