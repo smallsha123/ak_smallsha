@@ -511,6 +511,3 @@ if(!function_exists('http_request')){
 }
 
 
-function testss(){
-    return 'suc2222cess';
-}

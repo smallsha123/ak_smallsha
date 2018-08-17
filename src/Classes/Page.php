@@ -76,7 +76,7 @@ class Page {
 
     /* 不是直接去调用，通过该方法，可以使用在对象外部直接获取私有成员属性limit和page的值 */
     function __get($args){
-        if($args == "limit" || $args == "page")
+        if($args == "limit" || $args == "page" || $args == 'listNum')
             return $this->$args;
         else
             return null;
@@ -228,6 +228,7 @@ class Page {
             return 0;
         }
     }
+
 }
 //使用说明：
 //   $page=new \Smallsha\Page($count,12);

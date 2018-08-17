@@ -1,6 +1,24 @@
 <?php
 
-//使用ak_smallsha默认自定义加载func
+//是否开启组件模式 类似于yii中的component  建议在框架开始引入
+function startComponent( $config = [], $params = [] )
+{
+    $isFile = __DIR__ . '/src/Config/Bootstrap.php';
+    if (is_file($isFile)) {
+        require_once $isFile;
+
+        if (is_callable(array('Bootstrap', 'getInstance'))) {
+            call_user_func_array(array('Bootstrap', 'getInstance'), [$config, $params]);
+            return true;
+        } else {
+            trigger_error('This method getInstance is not defined in the current class.');
+        }
+    }
+
+}
+
+
+//此方法作用弥补工具类中不支持prs-4的类,进行加载文件
 function choose_bind_func( $filename = '', $is_all = false )
 {
     $rest_dir = __DIR__ . '/src/Function';
@@ -18,7 +36,7 @@ function choose_bind_func( $filename = '', $is_all = false )
 
 }
 
-
+//获取工具类func所有文件
 function getAkFunc()
 {
     $handle = opendir(__DIR__ . '/src/Function');
@@ -36,6 +54,30 @@ function getAkFunc()
         }
     }
 
+}
+
+//获取系统钩子方法
+function get_active_plugins()
+{
+    $Plugin_dir = __DIR__ . '/src/Plugins';
+    if (is_dir($Plugin_dir)) {
+        $handle = opendir($Plugin_dir);
+        if (!empty($handle)) {
+            while ($dir = readdir($handle)) {
+                $files[] = $dir;
+            }
+        }
+        $files = array_values(array_diff($files, ['.', '..']));
+
+        for ($i = 0; $i < count($files);) {
+            $arr[$i]['name'] = $files[$i] . '_actions';
+            $arr[$i]['directory'] = $files[$i];
+            $i++;
+        }
+        return [$Plugin_dir, $arr];
+    } else {
+        trigger_error('不是有效目录');
+    }
 }
 
 /**
@@ -213,12 +255,14 @@ if (!function_exists('BubbleSort')) {
     function BubbleSort( array $container )
     {
         $count = count($container);
+
         for ($j = 1; $j < $count; $j++) {
             for ($i = 0; $i < $count - $j; $i++) {
                 if ($container[$i] > $container[$i + 1]) {
-                    $temp = $container[$i];
-                    $container[$i] = $container[$i + 1];
-                    $container[$i + 1] = $temp;
+
+                    $temp = $container[$i];   //大数
+                    $container[$i] = $container[$i + 1]; //将小的数挪到当前大的数
+                    $container[$i + 1] = $temp;  //将大数赋值给的小的
                 }
             }
         }
@@ -303,6 +347,7 @@ if (!function_exists('QuickSort')) {
         $pivot = $container[0]; // 基准值 pivot
         $left = $right = [];
         for ($i = 1; $i < $count; $i++) {
+
             if ($container[$i] < $pivot) {
                 $left[] = $container[$i];
             } else {

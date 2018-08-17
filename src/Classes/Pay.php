@@ -5,15 +5,14 @@ class Pay{
     const QUERY_ORDER =  'https://api.mch.weixin.qq.com/pay/orderquery';
 
 	public function __construct($pay_param = ''){
+        if(!empty($pay_param)){
+            $this->appid=$pay_param['appid'];
+            $this->appsecret=$pay_param['appsecret'];
 
-        $this->appid=$pay_param['appid'];
-		$this->appsecret=$pay_param['appsecret'];
+            $this->mkey=$pay_param['mkey'];
 
-		$this->mkey=$pay_param['mkey'];
-
-		$this->mch_id=$pay_param['mchid'];
-
-		
+            $this->mch_id=$pay_param['mchid'];
+        }
 	}
 
 	 //获取预支付交易会话标识，有效期两个小时
@@ -105,8 +104,6 @@ class Pay{
 	    $result = md5($string1."&key=".$this->mkey);
 	    return strtoupper($result);
 	}
-
-
 
 
 }
