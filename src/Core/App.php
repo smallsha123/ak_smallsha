@@ -49,6 +49,7 @@ class App extends \Smallsha\Core\Component {
 
             // Event 将事件抽象出来
 
+
         }catch (\Smallsha\Core\SmallshaException $e){
 		    throw $e;
         }

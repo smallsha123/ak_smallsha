@@ -1,5 +1,5 @@
 <?php
-namespace Smallsha\Classes;
+namespace Smallsha\Databases;
 
 use PDO;
 use Exception;
@@ -32,11 +32,12 @@ class Medoo
 
 	public function __construct($options = null)
 	{
-		if (!is_array($options))
+p($options);
+
+        if (!is_array($options))
 		{
 			return false;
 		}
-
 		if (isset($options[ 'database_type' ]))
 		{
 			$this->type = strtolower($options[ 'database_type' ]);
@@ -46,6 +47,7 @@ class Medoo
 		{
 			$this->prefix = $options[ 'prefix' ];
 		}
+
 
 		if (isset($options[ 'option' ]))
 		{
@@ -65,6 +67,7 @@ class Medoo
 		{
 			$commands = [];
 		}
+
 
 		if (isset($options[ 'dsn' ]))
 		{
@@ -194,6 +197,7 @@ class Medoo
 			}
 		}
 
+
 		$driver = $attr[ 'driver' ];
 
 		unset($attr[ 'driver' ]);
@@ -222,6 +226,7 @@ class Medoo
 				isset($options[ 'password' ]) ? $options[ 'password' ] : null,
 				$this->option
 			);
+
 
 			foreach ($commands as $value)
 			{

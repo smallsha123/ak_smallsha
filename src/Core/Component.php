@@ -72,6 +72,7 @@ Class Component {
 				unset($component['class']);
 				$params = [];
 				if(isset($component['constructor'])){
+
 					$params = $component['constructor'];
 					unset($component['constructor']);
 				}
@@ -118,7 +119,7 @@ Class Component {
 	protected function buildInstance($class, $defination, $params, $com_alias_name) {
 		list ($reflection, $dependencies) = $this->getDependencies($class);
 
-		if(!empty($dependencies)){
+		if(!empty($params)){
             foreach ($params as $index => $param) {
                 $dependencies[$index] = $param;
             }
@@ -133,7 +134,6 @@ Class Component {
 		}
 		
         $object = $reflection->newInstanceArgs($dependencies);
-
 
         // 回调必须设置在配置的最后
         if(isset($defination[SWOOLEFY_COM_FUNC])) {
@@ -237,22 +237,15 @@ Class Component {
 	public function __get($name) {
 		if(!isset($this->$name)) {
 			if(isset($this->container[$name])) {
-				if(is_object($this->container[$name])) {	
+				if(is_object($this->container[$name])) {
 					return $this->container[$name];
 				}else {
 					$this->clearComponent($name);
 					return false;
 				}
-			}else if(in_array($name, array_keys(Swfy::$appConfig['components']))) {
+			}else if(in_array($name, array_keys(Small::$appConfig['components']))) {
 				// mysql,redis进程池中直接赋值
-				if(in_array($name, $this->component_pools)) {
-					$this->container[$name] = \Swoolefy\Core\Pools::getInstance()->getObj($name);
-					// 如果没有设置进程池处理实例，则降级到创建实例模式
-					if(is_object($this->container[$name])) {
-						return $this->container[$name];
-					}
-				}
-				return $this->creatObject($name, Swfy::$appConfig['components'][$name]);
+				return $this->creatObject($name, Small::$appConfig['components'][$name]);
 			}
 			return false;	
 		}
