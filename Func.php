@@ -1,5 +1,5 @@
 <?php
-
+/**********************************类库开发区********************************************/
 //是否开启组件模式 类似于yii中的component  建议在框架开始引入
 function startComponent( $config = [], $params = [] )
 {
@@ -18,7 +18,7 @@ function startComponent( $config = [], $params = [] )
 }
 
 
-//此方法作用弥补工具类中不支持prs-4的类,进行加载文件
+//此方法作用弥补工具类中不支持prs-4的类,按需加载文件
 function choose_bind_func( $filename = '', $is_all = false )
 {
     $rest_dir = __DIR__ . '/src/Function';
@@ -80,6 +80,9 @@ function get_active_plugins()
     }
 }
 
+
+/**********************************请求方法判断********************************************/
+
 /**
  * 是否是AJAx提交的
  * @return bool
@@ -112,7 +115,53 @@ if (!function_exists('isGet')) {
 if (!function_exists('isPost')) {
     function isPost()
     {
-        return ($_SERVER['REQUEST_METHOD'] == 'POST' && checkurlHash($GLOBALS['verify']) && (empty($_SERVER['HTTP_REFERER']) || preg_replace("~https?:\/\/([^\:\/]+).*~i", "\\1", $_SERVER['HTTP_REFERER']) == preg_replace("~([^\:]+).*~", "\\1", $_SERVER['HTTP_HOST']))) ? true : false;
+        return $_SERVER['REQUEST_METHOD'] == 'POST' ? true : false;
+    }
+}
+
+
+/**********************************数组处理********************************************/
+/**
+ * 二维数组根据字段进行排序
+ * @params array $array 需要排序的数组
+ * @params string $field 排序的字段
+ * @params string $sort 排序顺序标志 SORT_DESC 降序；SORT_ASC 升序
+ */
+if (!function_exists('arraySequence')) {
+
+    function arraySequence( $array, $field, $sort = 'SORT_ASC' )
+    {
+        $arrSort = array();
+        foreach ($array as $uniqid => $row) {
+            foreach ($row as $key => $value) {
+                $arrSort[$key][$uniqid] = $value;
+            }
+        }
+        array_multisort($arrSort[$field], constant($sort), $array);
+        return $array;
+    }
+}
+
+/*
+ * 二维数组去重
+ * */
+
+if (!function_exists('remove_duplicate')) {
+    function remove_duplicate( $array )
+    {
+        $result = array();
+        foreach ($array as $key => $value) {
+            $has = false;
+            foreach ($result as $val) {
+                if ($val['id'] == $value['id']) {
+                    $has = true;
+                    break;
+                }
+            }
+            if (!$has)
+                $result[] = $value;
+        }
+        return $result;
     }
 }
 
@@ -147,85 +196,6 @@ if (!function_exists('baseSerialize')) {
     }
 }
 
-/**
- * PHP精确计算  主要用于货币的计算用
- * @param $n1 第一个数
- * @param $symbol 计算符号 + - * / %
- * @param $n2 第二个数
- * @param string $scale 精度 默认为小数点后两位
- * @return  string
- */
-function ncPriceCalculate( $n1, $symbol, $n2, $scale = '2' )
-{
-    $res = "";
-    switch ($symbol) {
-        case "+"://加法
-            $res = bcadd($n1, $n2, $scale);
-            break;
-        case "-"://减法
-            $res = bcsub($n1, $n2, $scale);
-            break;
-        case "*"://乘法
-            $res = bcmul($n1, $n2, $scale);
-            break;
-        case "/"://除法
-            $res = bcdiv($n1, $n2, $scale);
-            break;
-        case "%"://求余、取模
-            $res = bcmod($n1, $n2, $scale);
-            break;
-        default:
-            $res = "";
-            break;
-    }
-    return $res;
-}
-
-/**
- * 价格由元转分
- * @param $price 金额
- * @return int
- */
-function ncPriceYuan2fen( $price )
-{
-    $price = (int)ncPriceCalculate(100, "*", ncPriceFormat($price));
-    return $price;
-}
-
-/**
- * 价格格式化
- *
- * @param int $price
- * @return string    $price_format
- */
-function ncPriceFormat( $price )
-{
-    $price_format = number_format($price, 2, '.', '');
-    return $price_format;
-}
-
-
-function generate_rand_string( $length = 8 )
-{
-    // 密码字符集，可任意添加你需要的字符
-    $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    $password = '';
-    for ($i = 0; $i < $length; $i++) {
-        // 这里提供两种字符获取方式
-        // 第一种是使用 substr 截取$chars中的任意一位字符；
-        // 第二种是取字符数组 $chars 的任意元素
-        // $password .= substr($chars, mt_rand(0, strlen($chars) – 1), 1);
-        $password .= $chars[mt_rand(0, strlen($chars) - 1)];
-    }
-    return $password;
-}
-
-if (!function_exists('AkConfig')) {
-    function AkConfig( $keys )
-    {
-        return ConfigCore::get($keys);
-    }
-}
 
 /**
  * 冒泡排序
@@ -365,6 +335,191 @@ if (!function_exists('xml_to_array')) {
     {
         $data = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
         return json_decode(json_encode($data), true);
+    }
+}
+
+/**
+ * 将xml转为array
+ * @param  string $xml xml字符串或者xml文件名
+ * @param  bool $isfile 传入的是否是xml文件名
+ * @return array    转换得到的数组
+ */
+function xml_array( $xml, $isfile = false )
+{
+    //禁止引用外部xml实体
+    libxml_disable_entity_loader(true);
+    if ($isfile) {
+        if (!file_exists($xml)) return false;
+        $xmlstr = file_get_contents($xml);
+    } else {
+        $xmlstr = $xml;
+    }
+    $result = json_decode(json_encode(simplexml_load_string($xmlstr, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
+    return $result;
+}
+
+
+/*
+ * array转xml
+ * @param is_dep false 针对的是浅层数组  true 针对深层数组
+ * */
+if (!function_exists('array_xml')) {
+    function array_xml( $data, $is_dep = false )
+    {
+        if (!is_array($data)) {
+            return false;
+        }
+        if ($is_dep == false) {
+            $xml = "<xml>";
+            foreach ($data as $key => $val) {
+                if (is_numeric($val)) {
+                    $xml .= "<" . $key . ">" . $val . "</" . $key . ">";
+                } else {
+                    $xml .= "<" . $key . "><![CDATA[" . $val . "]]></" . $key . ">";
+                }
+            }
+            $xml .= "</xml>";
+            return $xml;
+
+        } else {
+            return arr2xml($data);
+        }
+    }
+}
+
+/*
+ * 深层array转xml
+ * */
+if (!function_exists('arr2xml')) {
+    function arr2xml( $data, $root = true )
+    {
+        $str = "";
+        if ($root) $str .= "<xml>";
+        foreach ($data as $key => $val) {
+            if (is_array($val)) {
+                $child = arr2xml($val, false);
+                $str .= "<$key>$child</$key>";
+            } else {
+                $str .= "<$key><![CDATA[$val]]></$key>";
+            }
+        }
+        if ($root) $str .= "</xml>";
+        return $str;
+    }
+
+}
+
+/**********************************货币计算********************************************/
+/**
+ * PHP精确计算  主要用于货币的计算用
+ * @param $n1 第一个数
+ * @param $symbol 计算符号 + - * / %
+ * @param $n2 第二个数
+ * @param string $scale 精度 默认为小数点后两位
+ * @return  string
+ */
+function ncPriceCalculate( $n1, $symbol, $n2, $scale = '2' )
+{
+    $res = "";
+    switch ($symbol) {
+        case "+"://加法
+            $res = bcadd($n1, $n2, $scale);
+            break;
+        case "-"://减法
+            $res = bcsub($n1, $n2, $scale);
+            break;
+        case "*"://乘法
+            $res = bcmul($n1, $n2, $scale);
+            break;
+        case "/"://除法
+            $res = bcdiv($n1, $n2, $scale);
+            break;
+        case "%"://求余、取模
+            $res = bcmod($n1, $n2, $scale);
+            break;
+        default:
+            $res = "";
+            break;
+    }
+    return $res;
+}
+
+/**
+ * 价格由元转分
+ * @param $price 金额
+ * @return int
+ */
+function ncPriceYuan2fen( $price )
+{
+    $price = (int)ncPriceCalculate(100, "*", ncPriceFormat($price));
+    return $price;
+}
+
+/**
+ * 价格格式化
+ *
+ * @param int $price
+ * @return string    $price_format
+ */
+function ncPriceFormat( $price )
+{
+    $price_format = number_format($price, 2, '.', '');
+    return $price_format;
+}
+
+
+/**********************************工具方法********************************************/
+
+if (!function_exists('generate_rand_string')) {
+    function generate_rand_string( $length = 8 )
+    {
+        // 密码字符集，可任意添加你需要的字符
+        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        $password = '';
+        for ($i = 0; $i < $length; $i++) {
+            // 这里提供两种字符获取方式
+            // 第一种是使用 substr 截取$chars中的任意一位字符；
+            // 第二种是取字符数组 $chars 的任意元素
+            // $password .= substr($chars, mt_rand(0, strlen($chars) – 1), 1);
+            $password .= $chars[mt_rand(0, strlen($chars) - 1)];
+        }
+        return $password;
+    }
+
+}
+
+
+if (!function_exists('random')) {
+
+    function random( $length, $numeric = FALSE )
+    {
+
+        $seed = base_convert(md5(microtime() . $_SERVER['DOCUMENT_ROOT']), 16, $numeric ? 10 : 35);
+
+        $seed = $numeric ? (str_replace('0', '', $seed) . '012340567890') : ($seed . 'zZ' . strtoupper($seed));
+
+        if ($numeric) {
+
+            $hash = '';
+
+        } else {
+
+            $hash = chr(rand(1, 26) + rand(0, 1) * 32 + 64);
+
+            $length--;
+
+        }
+
+        $max = strlen($seed) - 1;
+
+        for ($i = 0; $i < $length; $i++) {
+
+            $hash .= $seed{mt_rand(0, $max)};
+
+        }
+
+        return $hash;
+
     }
 }
 
@@ -530,41 +685,6 @@ if (!function_exists('get_time')) {
 }
 
 
-if (!function_exists('random')) {
-
-    function random( $length, $numeric = FALSE )
-    {
-
-        $seed = base_convert(md5(microtime() . $_SERVER['DOCUMENT_ROOT']), 16, $numeric ? 10 : 35);
-
-        $seed = $numeric ? (str_replace('0', '', $seed) . '012340567890') : ($seed . 'zZ' . strtoupper($seed));
-
-        if ($numeric) {
-
-            $hash = '';
-
-        } else {
-
-            $hash = chr(rand(1, 26) + rand(0, 1) * 32 + 64);
-
-            $length--;
-
-        }
-
-        $max = strlen($seed) - 1;
-
-        for ($i = 0; $i < $length; $i++) {
-
-            $hash .= $seed{mt_rand(0, $max)};
-
-        }
-
-        return $hash;
-
-    }
-}
-
-
 if (!function_exists('timeFromNow')) {
     function timeFromNow( $dateline )
     {
@@ -584,6 +704,9 @@ if (!function_exists('timeFromNow')) {
     }
 }
 
+/*
+ * 获取视频源url
+ * */
 if (!function_exists('get_url_video')) {
     function get_url_video( $video )
     {
@@ -603,77 +726,6 @@ if (!function_exists('get_url_video')) {
         return $url;
     }
 
-}
-
-/*
- * array转xml
- * @param is_dep false 针对的是浅层数组  true 针对深层数组
- * */
-if (!function_exists('array_xml')) {
-    function array_xml( $data, $is_dep = false )
-    {
-        if (!is_array($data)) {
-            return false;
-        }
-        if ($is_dep == false) {
-            $xml = "<xml>";
-            foreach ($data as $key => $val) {
-                if (is_numeric($val)) {
-                    $xml .= "<" . $key . ">" . $val . "</" . $key . ">";
-                } else {
-                    $xml .= "<" . $key . "><![CDATA[" . $val . "]]></" . $key . ">";
-                }
-            }
-            $xml .= "</xml>";
-            return $xml;
-
-        } else {
-            return arr2xml($data);
-        }
-    }
-}
-
-/*
- * 深层array转xml
- * */
-if (!function_exists('arr2xml')) {
-    function arr2xml( $data, $root = true )
-    {
-        $str = "";
-        if ($root) $str .= "<xml>";
-        foreach ($data as $key => $val) {
-            if (is_array($val)) {
-                $child = arr2xml($val, false);
-                $str .= "<$key>$child</$key>";
-            } else {
-                $str .= "<$key><![CDATA[$val]]></$key>";
-            }
-        }
-        if ($root) $str .= "</xml>";
-        return $str;
-    }
-
-}
-
-
-/**
- * 将xml转为array
- * @param  string $xml xml字符串或者xml文件名
- * @param  bool $isfile 传入的是否是xml文件名
- * @return array    转换得到的数组
- */
-function xml_array( $xml, $isfile = false )
-{
-    //禁止引用外部xml实体
-    libxml_disable_entity_loader(true);
-    if ($isfile) {
-        if (!file_exists($xml)) return false;
-        $xmlstr = file_get_contents($xml);
-    } else {
-        $xmlstr = $xml;
-    }
-    $result = json_decode(json_encode(simplexml_load_string($xmlstr, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
-    return $result;
 }
 
 
@@ -715,13 +767,29 @@ if (!function_exists('getDistance')) {
 
 //echo getDistance(113.625368 , 34.7466 , 113.76985, 34.76984);
 
+/*
+ * 获取当前毫秒数
+ * */
 
-function msectime()
-{
-    list($msec, $sec) = explode(' ', microtime());
-    $msectime = (float)sprintf('%.0f', (floatval($msec) + floatval($sec)) * 1000);
-    return $msectime;
+if (!function_exists('msectime')) {
+    function msectime()
+    {
+        list($msec, $sec) = explode(' ', microtime());
+        $msectime = (float)sprintf('%.0f', (floatval($msec) + floatval($sec)) * 1000);
+        return $msectime;
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 
