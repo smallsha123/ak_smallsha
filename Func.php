@@ -1,5 +1,49 @@
 <?php
 /**********************************类库开发区********************************************/
+/**
+ *  * 写结果缓存文件
+ *  *
+ *  * @params string $cache_name
+ *  * @params string $caches
+ *  *
+ *  * @return
+ *  */
+function write_static_cache( $cache_name, $caches )
+{
+    $cache_file_path = __DIR__  . '/application/src/Asset/static_caches/' . md5($cache_name) . '.php';
+    $content = "<?php\r\n";
+    $content .= "\$sm_data = " . var_export($caches, true) . ";\r\n";
+    $content .= "?>";
+    file_put_contents($cache_file_path, $content, LOCK_EX);
+}
+
+/**
+ * 读结果缓存文件
+ *
+ * @params string $cache_name
+ *
+ * @return array  $data
+ */
+function read_static_cache($cache_name)
+{
+    static $result = array();
+    if (!empty($result[$cache_name]))
+    {
+        return $result[$cache_name];
+    }
+    $cache_file_path = __DIR__  . '/application/src/Asset/static_caches/' . md5($cache_name) . '.php';
+    if (file_exists($cache_file_path))
+    {
+        include_once($cache_file_path);
+        $result[$cache_name] = $sm_data;
+        return $result[$cache_name];
+    }
+    else
+    {
+        return false;
+    }
+}
+
 //是否开启组件模式 类似于yii中的component  建议在框架开始引入
 function startComponent( $config = [], $params = [] )
 {
@@ -469,7 +513,9 @@ function ncPriceFormat( $price )
 
 
 /**********************************工具方法********************************************/
-
+/*
+ * 获取随机字符串  用于生成订单号
+ * */
 if (!function_exists('generate_rand_string')) {
     function generate_rand_string( $length = 8 )
     {
@@ -483,12 +529,31 @@ if (!function_exists('generate_rand_string')) {
             // $password .= substr($chars, mt_rand(0, strlen($chars) – 1), 1);
             $password .= $chars[mt_rand(0, strlen($chars) - 1)];
         }
-        return $password;
+        return date('Y-m-d H:i', get_time()) . $password;
     }
 
 }
 
+/*
+ * 生成随机颜色值
+ * */
+if (!function_exists('randcol')) {
+    function randcol()
+    {
+        $str = '0123456789ABCDEF';
+        $estr = '#';
+        $len = strlen($str);
+        for ($i = 1; $i <= 6; $i++) {
+            $num = rand(0, $len - 1);
+            $estr = $estr . $str[$num];
+        }
+        return $estr;
+    }
+}
 
+/*
+ * 生成随机数 用于发送验证码
+ * */
 if (!function_exists('random')) {
 
     function random( $length, $numeric = FALSE )
@@ -523,7 +588,8 @@ if (!function_exists('random')) {
     }
 }
 
-//https请求(支持GET和POST)
+
+//https请求(支持GET和POST)   如果当前方法不能满足需求可以调用choose_bind_func('smRequest') 加载Request类
 function sm_request( $url, $data = null )
 {
     $curl = curl_init();
