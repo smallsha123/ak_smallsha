@@ -57,7 +57,8 @@ class App extends \Smallsha\Core\Component {
 
 
     public static function bootstrap(){
-	    if(Small::$params['development'] == true){
+
+	    if(Small::$params['development'] == TRUE){
 	        ini_set('display_errors',1);
 	        error_reporting(E_ALL);
         }else{
