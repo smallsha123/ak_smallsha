@@ -32,7 +32,6 @@ class Medoo
 
 	public function __construct($options = null)
 	{
-p($options);
 
         if (!is_array($options))
 		{

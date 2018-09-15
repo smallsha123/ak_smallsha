@@ -23,12 +23,12 @@ return [
 //            'class' => 'Smallsha/Classes/Medoo'
 //        ],
 //
-//        'Pay' => [
-//            'class' => 'Smallsha\Classes\Pay'
-//        ],
-//        'Page' => [
-//            'class' => 'Smallsha\Classes\Page'
-//        ],
+        'Pay' => [
+            'class' => 'Smallsha\Classes\Pay'
+        ],
+        'Page' => [
+            'class' => 'Smallsha\Classes\Page'
+        ],
         'Medoo' => [
             'class' => 'Smallsha\Databases\Medoo',
             'constructor'=> [
