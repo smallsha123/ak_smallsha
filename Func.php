@@ -1,5 +1,48 @@
 <?php
+/**********************************类库开发区********************************************/
+/**
+ *  * 写结果缓存文件
+ *  *
+ *  * @params string $cache_name
+ *  * @params string $caches
+ *  *
+ *  * @return
+ *  */
+function write_static_cache( $cache_name, $caches )
+{
+    $cache_file_path = __DIR__  . '/src/Asset/static_caches/' . md5($cache_name) . '.php';
+    $content = "<?php\r\n";
+    $content .= "\$sm_data = " . var_export($caches, true) . ";\r\n";
+    $content .= "?>";
+    file_put_contents($cache_file_path, $content, LOCK_EX);
+}
 
+/**
+ * 读结果缓存文件
+ *
+ * @params string $cache_name
+ *
+ * @return array  $data
+ */
+function read_static_cache($cache_name)
+{
+    static $result = array();
+    if (!empty($result[$cache_name]))
+    {
+        return $result[$cache_name];
+    }
+    $cache_file_path = __DIR__  . '/src/Asset/static_caches/' . md5($cache_name) . '.php';
+    if (file_exists($cache_file_path))
+    {
+        include_once($cache_file_path);
+        $result[$cache_name] = $sm_data;
+        return $result[$cache_name];
+    }
+    else
+    {
+        return false;
+    }
+}
 //是否开启组件模式 类似于yii中的component  建议在框架开始引入
 function startComponent( $config = [], $params = [] )
 {
