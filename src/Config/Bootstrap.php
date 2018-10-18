@@ -16,7 +16,7 @@ class Bootstrap
         }
         static::$params = require_once __DIR__ . '/params.php';
         if (!empty($params)) {
-            static::$params = array_merge(static::$params, $params);  //加载常用参数
+            static::$params = array_merge(static::$params, $params);  //加载常用参数11
         }
 
         return new \Smallsha\Core\App([static::$config, static::$params]);
