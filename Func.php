@@ -8,7 +8,7 @@
  *  *
  *  * @return
  *  */
-function write_static_cache( $cache_name, $caches )
+function write_static_cache( $cache_name1, $caches )
 {
     $cache_file_path = __DIR__  . '/src/Asset/static_caches/' . md5($cache_name) . '.php';
     $content = "<?php\r\n";
