@@ -1,4 +1,27 @@
 <?php
+
+function check_arr( $rs )
+{
+    {
+        foreach ($rs as $v) {
+            if (is_array($v)) {
+                foreach ($v as $val) {
+                    if (!$val) {
+                        return false;
+                    }
+                }
+            } else {
+                if (!$v) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+}
+
+
 /**********************************类库开发区********************************************/
 /**
  *  * 写结果缓存文件
@@ -10,7 +33,7 @@
  *  */
 function write_static_cache( $cache_name1, $caches )
 {
-    $cache_file_path = __DIR__  . '/src/Asset/static_caches/' . md5($cache_name) . '.php';
+    $cache_file_path = __DIR__ . '/src/Asset/static_caches/' . md5($cache_name) . '.php';
     $content = "<?php\r\n";
     $content .= "\$sm_data = " . var_export($caches, true) . ";\r\n";
     $content .= "?>";
@@ -24,25 +47,22 @@ function write_static_cache( $cache_name1, $caches )
  *
  * @return array  $data
  */
-function read_static_cache($cache_name)
+function read_static_cache( $cache_name )
 {
     static $result = array();
-    if (!empty($result[$cache_name]))
-    {
+    if (!empty($result[$cache_name])) {
         return $result[$cache_name];
     }
-    $cache_file_path = __DIR__  . '/src/Asset/static_caches/' . md5($cache_name) . '.php';
-    if (file_exists($cache_file_path))
-    {
+    $cache_file_path = __DIR__ . '/src/Asset/static_caches/' . md5($cache_name) . '.php';
+    if (file_exists($cache_file_path)) {
         include_once($cache_file_path);
         $result[$cache_name] = $sm_data;
         return $result[$cache_name];
-    }
-    else
-    {
+    } else {
         return false;
     }
 }
+
 //是否开启组件模式 类似于yii中的component  建议在框架开始引入
 function startComponent( $config = [], $params = [] )
 {
