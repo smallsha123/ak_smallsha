@@ -1,24 +1,34 @@
 <?php
-function check_arr( $rs )
-{
+
+if(!function_exists('sm')){
+    function sm($var){
+        echo "<pre>";
+        print_r($var);die;
+    }
+}
+if(!function_exists('sm')){
+    function check_arr( $rs )
     {
-        foreach ($rs as $v) {
-            if (is_array($v)) {
-                foreach ($v as $val) {
-                    if (!$val) {
+        {
+            foreach ($rs as $v) {
+                if (is_array($v)) {
+                    foreach ($v as $val) {
+                        if (!$val) {
+                            return false;
+                        }
+                    }
+                } else {
+                    if (!$v) {
                         return false;
                     }
                 }
-            } else {
-                if (!$v) {
-                    return false;
-                }
             }
+            return true;
         }
-        return true;
-    }
 
+    }
 }
+
 
 
 /**********************************类库开发区********************************************/
