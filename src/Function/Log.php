@@ -12,9 +12,8 @@ define('SM_ROOT',__DIR__ . '/../../../../../logs/');
 if(!function_exists('logging_run')){
     function logging_run($log, $type = 'trace', $filename = 'run') {
         global $_W;
-        $filename = SM_ROOT . '/data/logs/' . $filename . '_' . date('Ymd') . '.log';
+        $filename = SM_ROOT  . $filename . '_' . date('Ymd') . '.log';
 
-        load()->func('file');
         mkdirs(dirname($filename));
 
         $logFormat = "%date %type %user %url %context";

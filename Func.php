@@ -1,5 +1,4 @@
 <?php
-
 function check_arr( $rs )
 {
     {
@@ -31,11 +30,12 @@ function check_arr( $rs )
  *  *
  *  * @return
  *  */
-function write_static_cache( $cache_name1, $caches )
+function write_static_cache( $cache_name, $caches )
 {
     $cache_file_path = __DIR__ . '/src/Asset/static_caches/' . md5($cache_name) . '.php';
     $content = "<?php\r\n";
-    $content .= "\$sm_data = " . var_export($caches, true) . ";\r\n";
+    $caches =    $str = (is_string($caches) ? $caches : (is_array($caches) || is_object($caches)) ? print_r($caches, true) : var_export($caches, true)) . PHP_EOL;
+    $content .= "\$sm_data = " . $caches. ";\r\n";
     $content .= "?>";
     file_put_contents($cache_file_path, $content, LOCK_EX);
 }
