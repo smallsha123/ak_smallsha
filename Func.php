@@ -1,6 +1,6 @@
 <?php
 
-/*判断是否是身份证号码*/
+/*判断是否是身份证号码1*/
 function isIdentity( $id )
 {
     $id = strtoupper($id);
