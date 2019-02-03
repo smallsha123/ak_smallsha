@@ -112,6 +112,7 @@ if(!function_exists('sm')){
         print_r($var);die;
     }
 }
+
 if(!function_exists('check_arr')){
     function check_arr( $rs )
     {
