@@ -1,41 +1,42 @@
 <?php
 
 //判断应用是否是手机
-if(!function_exists('is_mobile_request')){
-    function is_mobile_request() {
+if (!function_exists('is_mobile_request')) {
+    function is_mobile_request()
+    {
         $_SERVER['ALL_HTTP'] = isset($_SERVER['ALL_HTTP']) ? $_SERVER['ALL_HTTP'] : '';
         $mobile_browser = '0';
-        if(preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|iphone|ipad|ipod|android|xoom)/i', strtolower($_SERVER['HTTP_USER_AGENT'])))
+        if (preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|iphone|ipad|ipod|android|xoom)/i', strtolower($_SERVER['HTTP_USER_AGENT'])))
             $mobile_browser++;
-        if((isset($_SERVER['HTTP_ACCEPT'])) and (strpos(strtolower($_SERVER['HTTP_ACCEPT']),'application/vnd.wap.xhtml+xml') !== false))
+        if ((isset($_SERVER['HTTP_ACCEPT'])) and (strpos(strtolower($_SERVER['HTTP_ACCEPT']), 'application/vnd.wap.xhtml+xml') !== false))
             $mobile_browser++;
-        if(isset($_SERVER['HTTP_X_WAP_PROFILE']))
+        if (isset($_SERVER['HTTP_X_WAP_PROFILE']))
             $mobile_browser++;
-        if(isset($_SERVER['HTTP_PROFILE']))
+        if (isset($_SERVER['HTTP_PROFILE']))
             $mobile_browser++;
-        $mobile_ua = strtolower(substr($_SERVER['HTTP_USER_AGENT'],0,4));
+        $mobile_ua = strtolower(substr($_SERVER['HTTP_USER_AGENT'], 0, 4));
         $mobile_agents = array(
-            'w3c ','acs-','alav','alca','amoi','audi','avan','benq','bird','blac',
-            'blaz','brew','cell','cldc','cmd-','dang','doco','eric','hipt','inno',
-            'ipaq','java','jigs','kddi','keji','leno','lg-c','lg-d','lg-g','lge-',
-            'maui','maxo','midp','mits','mmef','mobi','mot-','moto','mwbp','nec-',
-            'newt','noki','oper','palm','pana','pant','phil','play','port','prox',
-            'qwap','sage','sams','sany','sch-','sec-','send','seri','sgh-','shar',
-            'sie-','siem','smal','smar','sony','sph-','symb','t-mo','teli','tim-',
-            'tosh','tsm-','upg1','upsi','vk-v','voda','wap-','wapa','wapi','wapp',
-            'wapr','webc','winw','winw','xda','xda-'
+            'w3c ', 'acs-', 'alav', 'alca', 'amoi', 'audi', 'avan', 'benq', 'bird', 'blac',
+            'blaz', 'brew', 'cell', 'cldc', 'cmd-', 'dang', 'doco', 'eric', 'hipt', 'inno',
+            'ipaq', 'java', 'jigs', 'kddi', 'keji', 'leno', 'lg-c', 'lg-d', 'lg-g', 'lge-',
+            'maui', 'maxo', 'midp', 'mits', 'mmef', 'mobi', 'mot-', 'moto', 'mwbp', 'nec-',
+            'newt', 'noki', 'oper', 'palm', 'pana', 'pant', 'phil', 'play', 'port', 'prox',
+            'qwap', 'sage', 'sams', 'sany', 'sch-', 'sec-', 'send', 'seri', 'sgh-', 'shar',
+            'sie-', 'siem', 'smal', 'smar', 'sony', 'sph-', 'symb', 't-mo', 'teli', 'tim-',
+            'tosh', 'tsm-', 'upg1', 'upsi', 'vk-v', 'voda', 'wap-', 'wapa', 'wapi', 'wapp',
+            'wapr', 'webc', 'winw', 'winw', 'xda', 'xda-'
         );
-        if(in_array($mobile_ua, $mobile_agents))
+        if (in_array($mobile_ua, $mobile_agents))
             $mobile_browser++;
-        if(strpos(strtolower($_SERVER['ALL_HTTP']), 'operamini') !== false)
+        if (strpos(strtolower($_SERVER['ALL_HTTP']), 'operamini') !== false)
             $mobile_browser++;
         // Pre-final check to reset everything if the user is on Windows
-        if(strpos(strtolower($_SERVER['HTTP_USER_AGENT']), 'windows') !== false)
-            $mobile_browser=0;
+        if (strpos(strtolower($_SERVER['HTTP_USER_AGENT']), 'windows') !== false)
+            $mobile_browser = 0;
         // But WP7 is also Windows, with a slightly different characteristic
-        if(strpos(strtolower($_SERVER['HTTP_USER_AGENT']), 'windows phone') !== false)
+        if (strpos(strtolower($_SERVER['HTTP_USER_AGENT']), 'windows phone') !== false)
             $mobile_browser++;
-        if($mobile_browser>0)
+        if ($mobile_browser > 0)
             return true;
         else
             return false;
@@ -49,54 +50,46 @@ function isIdentity( $id )
     $id = strtoupper($id);
     $regx = "/(^\d{15}$)|(^\d{17}([0-9]|X)$)/";
     $arr_split = array();
-    if(!preg_match($regx, $id))
-    {
+    if (!preg_match($regx, $id)) {
         return FALSE;
     }
-    if(15==strlen($id)) //检查15位
+    if (15 == strlen($id)) //检查15位
     {
         $regx = "/^(\d{6})+(\d{2})+(\d{2})+(\d{2})+(\d{3})$/";
 
         @preg_match($regx, $id, $arr_split);
         //检查生日日期是否正确
-        $dtm_birth = "19".$arr_split[2] . '/' . $arr_split[3]. '/' .$arr_split[4];
-        if(!strtotime($dtm_birth))
-        {
+        $dtm_birth = "19" . $arr_split[2] . '/' . $arr_split[3] . '/' . $arr_split[4];
+        if (!strtotime($dtm_birth)) {
             return FALSE;
         } else {
             return TRUE;
         }
-    }
-    else      //检查18位
+    } else      //检查18位
     {
         $regx = "/^(\d{6})+(\d{4})+(\d{2})+(\d{2})+(\d{3})([0-9]|X)$/";
         @preg_match($regx, $id, $arr_split);
-        $dtm_birth = $arr_split[2] . '/' . $arr_split[3]. '/' .$arr_split[4];
-        if(!strtotime($dtm_birth)) //检查生日日期是否正确
+        $dtm_birth = $arr_split[2] . '/' . $arr_split[3] . '/' . $arr_split[4];
+        if (!strtotime($dtm_birth)) //检查生日日期是否正确
         {
             return FALSE;
-        }
-        else
-        {
+        } else {
             //检验18位身份证的校验码是否正确。
             //校验位按照ISO 7064:1983.MOD 11-2的规定生成，X可以认为是数字10。
             $arr_int = array(7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2);
             $arr_ch = array('1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2');
             $sign = 0;
-            for ( $i = 0; $i < 17; $i++ )
-            {
-                $b = (int) $id{$i};
+            for ($i = 0; $i < 17; $i++) {
+                $b = (int)$id{$i};
                 $w = $arr_int[$i];
                 $sign += $b * $w;
             }
             $n = $sign % 11;
             $val_num = $arr_ch[$n];
-            if ($val_num != substr($id,17, 1))
-            {
+            if ($val_num != substr($id, 17, 1)) {
                 return FALSE;
             } //phpfensi.com
-            else
-            {
+            else {
                 return TRUE;
             }
         }
@@ -105,15 +98,16 @@ function isIdentity( $id )
 }
 
 
-
-if(!function_exists('sm')){
-    function sm($var){
+if (!function_exists('sm')) {
+    function sm( $var )
+    {
         echo "<pre>";
-        print_r($var);die;
+        print_r($var);
+        die;
     }
 }
 
-if(!function_exists('check_arr')){
+if (!function_exists('check_arr')) {
     function check_arr( $rs )
     {
         {
@@ -137,7 +131,6 @@ if(!function_exists('check_arr')){
 }
 
 
-
 /**********************************类库开发区********************************************/
 /**
  *  * 写结果缓存文件
@@ -151,8 +144,8 @@ function write_static_cache( $cache_name, $caches )
 {
     $cache_file_path = __DIR__ . '/src/Asset/static_caches/' . md5($cache_name) . '.php';
     $content = "<?php\r\n";
-    $caches =    $str = (is_string($caches) ? $caches : (is_array($caches) || is_object($caches)) ? print_r($caches, true) : var_export($caches, true)) . PHP_EOL;
-    $content .= "\$sm_data = " . $caches. ";\r\n";
+    $caches = $str = (is_string($caches) ? $caches : (is_array($caches) || is_object($caches)) ? print_r($caches, true) : var_export($caches, true)) . PHP_EOL;
+    $content .= "\$sm_data = " . $caches . ";\r\n";
     $content .= "?>";
     file_put_contents($cache_file_path, $content, LOCK_EX);
 }
@@ -979,6 +972,69 @@ if (!function_exists('msectime')) {
         list($msec, $sec) = explode(' ', microtime());
         $msectime = (float)sprintf('%.0f', (floatval($msec) + floatval($sec)) * 1000);
         return $msectime;
+    }
+}
+
+
+if (!function_exists('export_mysql_txt')) {
+    function export_mysql_txt()
+    {
+        header("Content-type:text/html;charset=utf-8");
+        $path = RUNTIME_PATH . 'mysql/';
+        $database = config('database')['database'];
+        $info = "-- ----------------------------\r\n";
+        $info .= "-- 日期：" . date("Y-m-d H:i:s", time()) . "\r\n";
+        $info .= "-- MySQL - 5.5.52-MariaDB : Database - " . $database . "\r\n";
+        $info .= "-- ----------------------------\r\n\r\n";
+        $info .= "CREATE DATAbase IF NOT EXISTS `" . $database . "` DEFAULT CHARACTER SET utf8 ;\r\n\r\n";
+        $info .= "USE `" . $database . "`;\r\n\r\n";
+        if (is_dir($path)) {
+            if (is_writable($path)) {
+            } else {
+                chmod($path, 0777);
+            }
+        } else {
+            mkdir($path, 0777, true);
+        }
+
+        $file_name = $path . $database . '-' . date("Y-m-d", time()) . '.sql';
+        if (file_exists($file_name)) {
+            echo "数据备份文件已存在！";
+            exit;
+        }
+        file_put_contents($file_name, $info, FILE_APPEND);
+        $result = \think\Db::query('show tables');
+        foreach ($result as $k => $v) {
+            $val = $v['Tables_in_' . $database];
+            $sql_table = "show create table " . $val;
+            $res = \think\Db::query($sql_table);
+            $info_table = "-- ----------------------------\r\n";
+            $info_table .= "-- Table structure for `" . $val . "`\r\n";
+            $info_table .= "-- ----------------------------\r\n\r\n";
+            $info_table .= "DROP TABLE IF EXISTS `" . $val . "`;\r\n\r\n";
+            $info_table .= $res[0]['Create Table'] . ";\r\n\r\n";
+            $info_table .= "-- ----------------------------\r\n";
+            $info_table .= "-- Data for the table `" . $val . "`\r\n";
+            $info_table .= "-- ----------------------------\r\n\r\n";
+            file_put_contents($file_name, $info_table, FILE_APPEND);
+            $sql_data = "select * from " . $val;
+            $data = \think\Db::query($sql_data);
+            $count = count($data);
+            if ($count < 1) continue;
+            foreach ($data as $key => $value) {
+                $sqlStr = "INSERT INTO `" . $val . "` VALUES (";
+                foreach ($value as $v_d) {
+                    $v_d = str_replace("'", "\'", $v_d);
+                    $sqlStr .= "'" . $v_d . "', ";
+                }
+                $sqlStr = substr($sqlStr, 0, strlen($sqlStr) - 2);
+                $sqlStr .= ");\r\n";
+                file_put_contents($file_name, $sqlStr, FILE_APPEND);
+            }
+            $info = "\r\n";
+            file_put_contents($file_name, $info, FILE_APPEND);
+        }
+        echo "数据备份完成！";
     }
 }
 
