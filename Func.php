@@ -97,6 +97,17 @@ function isIdentity( $id )
 
 }
 
+if(!function_exists('shuffle_assoc')){
+    function shuffle_assoc($list) {
+        if (!is_array($list)) return $list;
+        $keys = array_keys($list);
+        shuffle($keys);
+        $random = array();
+        foreach ($keys as $key)
+            $random[$key] = $list[$key];
+        return $random;
+    }
+}
 
 if (!function_exists('sm')) {
     function sm( $var )
