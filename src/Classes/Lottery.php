@@ -8,7 +8,6 @@ class Lottery
     public $dataList;
     public $wining_key;
     public $pushData = [];
-
     /*$prize_arr = array(    // $dataList数据格式
     '0' => array('id'=>1,'prize'=>'平板电脑','v'=>1),
     '1' => array('id'=>2,'prize'=>'数码相机','v'=>5),
@@ -17,11 +16,13 @@ class Lottery
     '4' => array('id'=>5,'prize'=>'10Q币','v'=>22),
     '5' => array('id'=>6,'prize'=>'下次没准就能中哦','v'=>50),
     );*/
-    public function __construct( $data )
+    public function __construct($data=[],$win_key )
     {
-        $this->dataList = $data;
+        foreach($data as $k => $v){
+            $arr[$v['id']] = $v[$win_key];
+        }
+        $this->dataList = $arr;
     }
-
 
     //抽奖算法
     public function getDataRand()
@@ -32,24 +33,17 @@ class Lottery
         foreach ($this->dataList as $key => $proCur) {
             $randNum = mt_rand(1, $proSum);
             if ($randNum <= $proCur) {
-                $this->wining_key = $key;  //获得奖品的ID
+                $this->pushData['win_key'] = $key;  //获得奖品的ID
                 break;
             } else {
                 $proSum -= $proCur;
             }
         }
-        return $this;
-    }
-
-    //
-    public function pushData(){
-        $this->pushData['win_data'] = $this->dataList[$this->wining_key];
-        unset($this->dataList[$this->wining_key]);
-        foreach($this->dataList as $k=>$v){
-            $this->pushData['fail_data'] = $v;
-        }
+        unset($this->dataList[$this->pushData['win_key']]);
+        $this->pushData['fail_key'] = array_keys($this->dataList);
         return $this->pushData;
     }
+
 }
 
 ?>

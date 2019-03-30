@@ -97,6 +97,57 @@ function isIdentity( $id )
 
 }
 
+if(!function_exists('check_data')){
+    function check_data($data, $rule = NULL, $ext = NULL)
+    {
+        $data = trim(str_replace(PHP_EOL, '', $data));
+
+        if (empty($data)) {
+            return false;
+        }
+        $validate['require'] = '/.+/';
+        $validate['url'] = '/^http(s?):\\/\\/(?:[A-za-z0-9-]+\\.)+[A-za-z]{2,4}(?:[\\/\\?#][\\/=\\?%\\-&~`@[\\]\':+!\\.#\\w]*)?$/';
+        $validate['currency'] = '/^\\d+(\\.\\d+)?$/';
+        $validate['number'] = '/^\\d+$/';
+        $validate['zip'] = '/^\\d{6}$/';
+        $validate['cny'] = '/^(([1-9]{1}\\d*)|([0]{1}))(\\.(\\d){1,2})?$/';
+        $validate['integer'] = '/^[\\+]?\\d+$/';
+        $validate['double'] = '/^[\\+]?\\d+(\\.\\d+)?$/';
+        $validate['english'] = '/^[A-Za-z]+$/';
+        $validate['idcard'] = '/^([0-9]{15}|[0-9]{17}[0-9a-zA-Z])$/';
+        $validate['truename'] = '/^[\\x{4e00}-\\x{9fa5}]{2,20}$/u';
+        $validate['username'] = '/^[0-9a-z_]{3,15}$/';
+        $validate['email'] = '/^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$/';
+        $validate['moble'] = '/^(((1[0-9][0-9]{1})|159|153)+\\d{8})$/';
+        $validate['password'] = '/^[a-zA-Z0-9]{6,16}$/';
+        $validate['xnb'] = '/^[a-zA-Z]$/';
+
+        if (isset($validate[strtolower($rule)])) {
+            $rule = $validate[strtolower($rule)];
+            return preg_match($rule, $data);
+        }
+        $Ap = '\\x{4e00}-\\x{9fff}' . '0-9a-zA-Z\\@\\#\\$\\%\\^\\&\\*\\(\\)\\!\\,\\.\\?\\-\\+\\|\\=';
+        $Cp = '\\x{4e00}-\\x{9fff}';
+        $Dp = '0-9';
+        $Wp = 'a-zA-Z';
+        $Np = 'a-z';
+        $Tp = '@#$%^&*()-+=';
+        $_p = '_';
+        $pattern = '/^[';
+        $OArr = str_split(strtolower($rule));
+        in_array('a', $OArr) && ($pattern .= $Ap);
+        in_array('c', $OArr) && ($pattern .= $Cp);
+        in_array('d', $OArr) && ($pattern .= $Dp);
+        in_array('w', $OArr) && ($pattern .= $Wp);
+        in_array('n', $OArr) && ($pattern .= $Np);
+        in_array('t', $OArr) && ($pattern .= $Tp);
+        in_array('_', $OArr) && ($pattern .= $_p);
+        isset($ext) && ($pattern .= $ext);
+        $pattern .= ']+$/u';
+        return preg_match($pattern, $data);
+    }
+}
+
 if(!function_exists('shuffle_assoc')){
     function shuffle_assoc($list) {
         if (!is_array($list)) return $list;
