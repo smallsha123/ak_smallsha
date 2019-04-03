@@ -508,6 +508,30 @@ if(!function_exists('http_request')){
         }
     }
 
+    function error($msg, $data = [], $code = 0)
+    {
+        die(ijson([
+            'code' => $code,
+            'msg' => $msg,
+            'data' => $data,
+        ]));
+    }
+
+    function response($data, $code = 1, $msg = '')
+    {
+        die(ijson([
+            'code' => $code,
+            'msg' => $msg,
+            'data' => $data,
+        ]));
+    }
+
+    function ijson($json)
+    {
+        return json_encode($json);
+    }
+
+
 }
 
 
