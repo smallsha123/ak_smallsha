@@ -1,4 +1,5 @@
 <?php
+
 namespace Smallsha\Classes;
 /**
  * redis操作类
@@ -12,7 +13,7 @@ class Redis
     private $redis;
 
     //当前数据库ID号
-    protected $dbId=0;
+    protected $dbId = 0;
 
     //当前权限认证码
     protected $auth;
@@ -21,16 +22,16 @@ class Redis
      * 实例化的对象,单例模式.
      * @var \iphp\db\Redis
      */
-    static private $_instance=array();
+    static private $_instance = array();
 
-    private  $k;
+    private $k;
 
     //连接属性数组
-    protected $attr=array(
+    protected $attr = array(
         //连接超时时间，redis配置文件中默认为300秒
-        'timeout'=>30,
+        'timeout' => 30,
         //选择的数据库。
-        'db_id'=>0,
+        'db_id' => 0,
     );
 
     //什么时候重新建立连接
@@ -41,21 +42,21 @@ class Redis
     protected $port;
 
 
-    private function __construct($config,$attr=array())
+    private function __construct( $config, $attr = array() )
     {
-        $this->attr        =    array_merge($this->attr,$attr);
-        $this->redis    =    new Redis();
-        $this->port        =    $config['port'] ? $config['port'] : 6379;
-        $this->host        =    $config['host'];
-        $this->redis->connect($this->host, $this->port, $this->attr['timeout']);
+        $this->attr = array_merge($this->attr, $attr);
+        $this->redis = new \Redis();
+        $this->port = isset($config['port']) ? $config['port'] : 6379;
+        $this->host = $config['host'];
+        $this->redis->connect($this->host, $this->port, $this->attr['timeout'] ?? 300);
 
-        if($config['auth'])
-        {
+
+        if (isset($config['auth'])) {
             $this->auth($config['auth']);
-            $this->auth    =    $config['auth'];
+            $this->auth = $config['auth'];
         }
 
-        $this->expireTime    =    time() + $this->attr['timeout'];
+        $this->expireTime = time() + $this->attr['timeout'];
     }
 
     /**
@@ -66,48 +67,44 @@ class Redis
      * @param int $dbId
      * @return \iphp\db\Redis
      */
-    public static function getInstance($config, $attr = array())
+    public static function getInstance( $config, $attr = array() )
     {
         //如果是一个字符串，将其认为是数据库的ID号。以简化写法。
-        if(!is_array($attr))
-        {
-            $dbId    =    $attr;
-            $attr    =    array();
-            $attr['db_id']    =    $dbId;
+        if (!is_array($attr)) {
+            $dbId = $attr;
+            $attr = array();
+            $attr['db_id'] = $dbId;
         }
 
-        $attr['db_id']    =    $attr['db_id'] ? $attr['db_id'] : 0;
+        $attr['db_id'] = isset($attr['db_id']) ? $attr['db_id'] : 0;
 
 
-        $k    =    md5(implode('', $config).$attr['db_id']);
-        if(! (static::$_instance[$k] instanceof self))
-        {
-
-            static::$_instance[$k] = new self($config,$attr);
-            static::$_instance[$k]->k        =    $k;
-            static::$_instance[$k]->dbId    =    $attr['db_id'];
+        $k = md5(implode('', $config) . $attr['db_id']);
+        if (!isset(static::$_instance[$k]) || !(static::$_instance[$k] instanceof self)) {
+            static::$_instance[$k] = new self($config, $attr);
+            static::$_instance[$k]->k = $k;
+            static::$_instance[$k]->dbId = $attr['db_id'];
 
             //如果不是0号库，选择一下数据库。
-            if($attr['db_id'] != 0){
+            if ($attr['db_id'] != 0) {
                 static::$_instance[$k]->select($attr['db_id']);
             }
-        }
-        elseif( time() > static::$_instance[$k]->expireTime)
-        {
+        } elseif (time() > static::$_instance[$k]->expireTime) {
             static::$_instance[$k]->close();
-            static::$_instance[$k]         =     new self($config,$attr);
-            static::$_instance[$k]->k    =    $k;
-            static::$_instance[$k]->dbId=    $attr['db_id'];
-
+            static::$_instance[$k] = new self($config, $attr);
+            static::$_instance[$k]->k = $k;
+            static::$_instance[$k]->dbId = $attr['db_id'];
             //如果不是0号库，选择一下数据库。
-            if($attr['db_id']!=0){
+            if ($attr['db_id'] != 0) {
                 static::$_instance[$k]->select($attr['db_id']);
             }
         }
         return static::$_instance[$k];
     }
 
-    private function __clone(){}
+    private function __clone()
+    {
+    }
 
     /**
      * 执行原生的redis操作
@@ -123,52 +120,51 @@ class Redis
     /**
      * 得到hash表中一个字段的值
      * @param string $key 缓存key
-     * @param string  $field 字段
+     * @param string $field 字段
      * @return string|false
      */
-    public function hGet($key,$field)
+    public function hGet( $key, $field )
     {
-        return $this->redis->hGet($key,$field);
+        return $this->redis->hGet($key, $field);
     }
 
     /**
      * 为hash表设定一个字段的值
      * @param string $key 缓存key
-     * @param string  $field 字段
+     * @param string $field 字段
      * @param string $value 值。
      * @return bool
      */
-    public function hSet($key,$field,$value)
+    public function hSet( $key, $field, $value )
     {
-        return $this->redis->hSet($key,$field,$value);
+        return $this->redis->hSet($key, $field, $value);
     }
 
     /**
      * 判断hash表中，指定field是不是存在
      * @param string $key 缓存key
-     * @param string  $field 字段
+     * @param string $field 字段
      * @return bool
      */
-    public function hExists($key,$field)
+    public function hExists( $key, $field )
     {
-        return $this->redis->hExists($key,$field);
+        return $this->redis->hExists($key, $field);
     }
 
     /**
      * 删除hash表中指定字段 ,支持批量删除
      * @param string $key 缓存key
-     * @param string  $field 字段
+     * @param string $field 字段
      * @return int
      */
-    public function hdel($key,$field)
+    public function hdel( $key, $field )
     {
-        $fieldArr=explode(',',$field);
-        $delNum=0;
+        $fieldArr = explode(',', $field);
+        $delNum = 0;
 
-        foreach($fieldArr as $row)
-        {
-            $row=trim($row);
-            $delNum+=$this->redis->hDel($key,$row);
+        foreach ($fieldArr as $row) {
+            $row = trim($row);
+            $delNum += $this->redis->hDel($key, $row);
         }
 
         return $delNum;
@@ -179,7 +175,7 @@ class Redis
      * @param string $key 缓存key
      * @return int|bool
      */
-    public function hLen($key)
+    public function hLen( $key )
     {
         return $this->redis->hLen($key);
     }
@@ -187,13 +183,13 @@ class Redis
     /**
      * 为hash表设定一个字段的值,如果字段存在，返回false
      * @param string $key 缓存key
-     * @param string  $field 字段
+     * @param string $field 字段
      * @param string $value 值。
      * @return bool
      */
-    public function hSetNx($key,$field,$value)
+    public function hSetNx( $key, $field, $value )
     {
-        return $this->redis->hSetNx($key,$field,$value);
+        return $this->redis->hSetNx($key, $field, $value);
     }
 
     /**
@@ -202,11 +198,11 @@ class Redis
      * @param array $value
      * @return array|bool
      */
-    public function hMset($key,$value)
+    public function hMset( $key, $value )
     {
-        if(!is_array($value))
+        if (!is_array($value))
             return false;
-        return $this->redis->hMset($key,$value);
+        return $this->redis->hMset($key, $value);
     }
 
     /**
@@ -215,11 +211,11 @@ class Redis
      * @param array|string $value string以','号分隔字段
      * @return array|bool
      */
-    public function hMget($key,$field)
+    public function hMget( $key, $field )
     {
-        if(!is_array($field))
-            $field=explode(',', $field);
-        return $this->redis->hMget($key,$field);
+        if (!is_array($field))
+            $field = explode(',', $field);
+        return $this->redis->hMget($key, $field);
     }
 
     /**
@@ -229,10 +225,10 @@ class Redis
      * @param string $value
      * @return bool
      */
-    public function hIncrBy($key,$field,$value)
+    public function hIncrBy( $key, $field, $value )
     {
-        $value=intval($value);
-        return $this->redis->hIncrBy($key,$field,$value);
+        $value = intval($value);
+        return $this->redis->hIncrBy($key, $field, $value);
     }
 
     /**
@@ -240,7 +236,7 @@ class Redis
      * @param string $key
      * @return array|bool
      */
-    public function hKeys($key)
+    public function hKeys( $key )
     {
         return $this->redis->hKeys($key);
     }
@@ -250,7 +246,7 @@ class Redis
      * @param string $key
      * @return array|bool
      */
-    public function hVals($key)
+    public function hVals( $key )
     {
         return $this->redis->hVals($key);
     }
@@ -260,7 +256,7 @@ class Redis
      * @param string $key
      * @return array|bool
      */
-    public function hGetAll($key)
+    public function hGetAll( $key )
     {
         return $this->redis->hGetAll($key);
     }
@@ -275,9 +271,9 @@ class Redis
      * @param string $value 值
      * @return bool
      */
-    public function zAdd($key,$order,$value)
+    public function zAdd( $key, $order, $value )
     {
-        return $this->redis->zAdd($key,$order,$value);
+        return $this->redis->zAdd($key, $order, $value);
     }
 
     /**
@@ -287,9 +283,9 @@ class Redis
      * @param string $value 值
      * @return 返回新的order
      */
-    public function zinCry($key,$num,$value)
+    public function zinCry( $key, $num, $value )
     {
-        return $this->redis->zinCry($key,$num,$value);
+        return $this->redis->zinCry($key, $num, $value);
     }
 
     /**
@@ -298,9 +294,9 @@ class Redis
      * @param stirng $value
      * @return bool
      */
-    public function zRem($key,$value)
+    public function zRem( $key, $value )
     {
-        return $this->redis->zRem($key,$value);
+        return $this->redis->zRem($key, $value);
     }
 
     /**
@@ -310,9 +306,9 @@ class Redis
      * @param int $end
      * @return array|bool
      */
-    public function zRange($key,$start,$end)
+    public function zRange( $key, $start, $end )
     {
-        return $this->redis->zRange($key,$start,$end);
+        return $this->redis->zRange($key, $start, $end);
     }
 
     /**
@@ -322,9 +318,9 @@ class Redis
      * @param int $end
      * @return array|bool
      */
-    public function zRevRange($key,$start,$end)
+    public function zRevRange( $key, $start, $end )
     {
-        return $this->redis->zRevRange($key,$start,$end);
+        return $this->redis->zRevRange($key, $start, $end);
     }
 
     /**
@@ -338,9 +334,9 @@ class Redis
      *     limit=>array(0,1) 表示从0开始，取一条记录。
      * @return array|bool
      */
-    public function zRangeByScore($key,$start='-inf',$end="+inf",$option=array())
+    public function zRangeByScore( $key, $start = '-inf', $end = "+inf", $option = array() )
     {
-        return $this->redis->zRangeByScore($key,$start,$end,$option);
+        return $this->redis->zRangeByScore($key, $start, $end, $option);
     }
 
     /**
@@ -354,9 +350,9 @@ class Redis
      *     limit=>array(0,1) 表示从0开始，取一条记录。
      * @return array|bool
      */
-    public function zRevRangeByScore($key,$start='-inf',$end="+inf",$option=array())
+    public function zRevRangeByScore( $key, $start = '-inf', $end = "+inf", $option = array() )
     {
-        return $this->redis->zRevRangeByScore($key,$start,$end,$option);
+        return $this->redis->zRevRangeByScore($key, $start, $end, $option);
     }
 
     /**
@@ -365,9 +361,9 @@ class Redis
      * @param unknown $start
      * @param unknown $end
      */
-    public function zCount($key,$start,$end)
+    public function zCount( $key, $start, $end )
     {
-        return $this->redis->zCount($key,$start,$end);
+        return $this->redis->zCount($key, $start, $end);
     }
 
     /**
@@ -375,9 +371,9 @@ class Redis
      * @param unknown $key
      * @param unknown $value
      */
-    public function zScore($key,$value)
+    public function zScore( $key, $value )
     {
-        return $this->redis->zScore($key,$value);
+        return $this->redis->zScore($key, $value);
     }
 
     /**
@@ -385,9 +381,9 @@ class Redis
      * @param unknown $key
      * @param unknown $value
      */
-    public function zRank($key,$value)
+    public function zRank( $key, $value )
     {
-        return $this->redis->zRank($key,$value);
+        return $this->redis->zRank($key, $value);
     }
 
     /**
@@ -395,9 +391,9 @@ class Redis
      * @param unknown $key
      * @param unknown $value
      */
-    public function zRevRank($key,$value)
+    public function zRevRank( $key, $value )
     {
-        return $this->redis->zRevRank($key,$value);
+        return $this->redis->zRevRank($key, $value);
     }
 
     /**
@@ -408,16 +404,16 @@ class Redis
      * @param unknown $end
      * @return 删除成员的数量。
      */
-    public function zRemRangeByScore($key,$start,$end)
+    public function zRemRangeByScore( $key, $start, $end )
     {
-        return $this->redis->zRemRangeByScore($key,$start,$end);
+        return $this->redis->zRemRangeByScore($key, $start, $end);
     }
 
     /**
      * 返回集合元素个数。
      * @param unknown $key
      */
-    public function zCard($key)
+    public function zCard( $key )
     {
         return $this->redis->zCard($key);
     }
@@ -429,9 +425,9 @@ class Redis
      * @param unknown $value
      * 返回队列长度
      */
-    public function rPush($key,$value)
+    public function rPush( $key, $value )
     {
-        return $this->redis->rPush($key,$value);
+        return $this->redis->rPush($key, $value);
     }
 
     /**
@@ -440,9 +436,9 @@ class Redis
      * @param unknown $value
      * 返回队列长度
      */
-    public function rPushx($key,$value)
+    public function rPushx( $key, $value )
     {
-        return $this->redis->rPushx($key,$value);
+        return $this->redis->rPushx($key, $value);
     }
 
     /**
@@ -451,9 +447,9 @@ class Redis
      * @param unknown $value
      * 返回队列长度
      */
-    public function lPush($key,$value)
+    public function lPush( $key, $value )
     {
-        return $this->redis->lPush($key,$value);
+        return $this->redis->lPush($key, $value);
     }
 
     /**
@@ -462,16 +458,16 @@ class Redis
      * @param unknown $value
      * 返回队列长度
      */
-    public function lPushx($key,$value)
+    public function lPushx( $key, $value )
     {
-        return $this->redis->lPushx($key,$value);
+        return $this->redis->lPushx($key, $value);
     }
 
     /**
      * 返回队列长度
      * @param unknown $key
      */
-    public function lLen($key)
+    public function lLen( $key )
     {
         return $this->redis->lLen($key);
     }
@@ -482,9 +478,9 @@ class Redis
      * @param unknown $start
      * @param unknown $end
      */
-    public function lRange($key,$start,$end)
+    public function lRange( $key, $start, $end )
     {
-        return $this->redis->lrange($key,$start,$end);
+        return $this->redis->lrange($key, $start, $end);
     }
 
     /**
@@ -492,9 +488,9 @@ class Redis
      * @param unknown $key
      * @param unknown $index
      */
-    public function lIndex($key,$index)
+    public function lIndex( $key, $index )
     {
-        return $this->redis->lIndex($key,$index);
+        return $this->redis->lIndex($key, $index);
     }
 
     /**
@@ -503,9 +499,9 @@ class Redis
      * @param unknown $index
      * @param unknown $value
      */
-    public function lSet($key,$index,$value)
+    public function lSet( $key, $index, $value )
     {
-        return $this->redis->lSet($key,$index,$value);
+        return $this->redis->lSet($key, $index, $value);
     }
 
     /**
@@ -518,16 +514,16 @@ class Redis
      * @param unknown $count
      * @param unknown $value
      */
-    public function lRem($key,$count,$value)
+    public function lRem( $key, $count, $value )
     {
-        return $this->redis->lRem($key,$value,$count);
+        return $this->redis->lRem($key, $value, $count);
     }
 
     /**
      * 删除并返回队列中的头元素。
      * @param unknown $key
      */
-    public function lPop($key)
+    public function lPop( $key )
     {
         return $this->redis->lPop($key);
     }
@@ -536,7 +532,7 @@ class Redis
      * 删除并返回队列中的尾元素
      * @param unknown $key
      */
-    public function rPop($key)
+    public function rPop( $key )
     {
         return $this->redis->rPop($key);
     }
@@ -548,16 +544,16 @@ class Redis
      * @param unknown $key
      * @param unknown $value
      */
-    public function set($key,$value)
+    public function set( $key, $value )
     {
-        return $this->redis->set($key,$value);
+        return $this->redis->set($key, $value);
     }
 
     /**
      * 得到一个key
      * @param unknown $key
      */
-    public function get($key)
+    public function get( $key )
     {
         return $this->redis->get($key);
     }
@@ -568,9 +564,9 @@ class Redis
      * @param unknown $expire
      * @param unknown $value
      */
-    public function setex($key,$expire,$value)
+    public function setex( $key, $expire, $value )
     {
-        return $this->redis->setex($key,$expire,$value);
+        return $this->redis->setex($key, $expire, $value);
     }
 
 
@@ -579,16 +575,16 @@ class Redis
      * @param unknown $key
      * @param unknown $value
      */
-    public function setnx($key,$value)
+    public function setnx( $key, $value )
     {
-        return $this->redis->setnx($key,$value);
+        return $this->redis->setnx($key, $value);
     }
 
     /**
      * 批量设置key
      * @param unknown $arr
      */
-    public function mset($arr)
+    public function mset( $arr )
     {
         return $this->redis->mset($arr);
     }
@@ -599,7 +595,7 @@ class Redis
      * 返回集合中所有元素
      * @param unknown $key
      */
-    public function sMembers($key)
+    public function sMembers( $key )
     {
         return $this->redis->sMembers($key);
     }
@@ -609,9 +605,9 @@ class Redis
      * @param unknown $key1
      * @param unknown $key2
      */
-    public function sDiff($key1,$key2)
+    public function sDiff( $key1, $key2 )
     {
-        return $this->redis->sDiff($key1,$key2);
+        return $this->redis->sDiff($key1, $key2);
     }
 
     /**
@@ -619,21 +615,21 @@ class Redis
      * @param unknown $key
      * @param string|array $value
      */
-    public function sAdd($key,$value)
+    public function sAdd( $key, $value )
     {
-        if(!is_array($value))
-            $arr=array($value);
+        if (!is_array($value))
+            $arr = array($value);
         else
-            $arr=$value;
-        foreach($arr as $row)
-            $this->redis->sAdd($key,$row);
+            $arr = $value;
+        foreach ($arr as $row)
+            $this->redis->sAdd($key, $row);
     }
 
     /**
      * 返回无序集合的元素个数
      * @param unknown $key
      */
-    public function scard($key)
+    public function scard( $key )
     {
         return $this->redis->scard($key);
     }
@@ -643,9 +639,9 @@ class Redis
      * @param unknown $key
      * @param unknown $value
      */
-    public function srem($key,$value)
+    public function srem( $key, $value )
     {
-        return $this->redis->srem($key,$value);
+        return $this->redis->srem($key, $value);
     }
 
     /*************redis管理操作命令*****************/
@@ -655,9 +651,9 @@ class Redis
      * @param int $dbId 数据库ID号
      * @return bool
      */
-    public function select($dbId)
+    public function select( $dbId )
     {
-        $this->dbId=$dbId;
+        $this->dbId = $dbId;
         return $this->redis->select($dbId);
     }
 
@@ -709,7 +705,7 @@ class Redis
      * @param string $key
      * @return array
      */
-    public function keys($key)
+    public function keys( $key )
     {
         return $this->redis->keys($key);
     }
@@ -718,7 +714,7 @@ class Redis
      * 删除指定key
      * @param unknown $key
      */
-    public function del($key)
+    public function del( $key )
     {
         return $this->redis->del($key);
     }
@@ -727,7 +723,7 @@ class Redis
      * 判断一个key值是不是存在
      * @param unknown $key
      */
-    public function exists($key)
+    public function exists( $key )
     {
         return $this->redis->exists($key);
     }
@@ -737,16 +733,16 @@ class Redis
      * @param unknown $key
      * @param unknown $expire
      */
-    public function expire($key,$expire)
+    public function expire( $key, $expire )
     {
-        return $this->redis->expire($key,$expire);
+        return $this->redis->expire($key, $expire);
     }
 
     /**
      * 返回一个key还有多久过期，单位秒
      * @param unknown $key
      */
-    public function ttl($key)
+    public function ttl( $key )
     {
         return $this->redis->ttl($key);
     }
@@ -756,9 +752,9 @@ class Redis
      * @param unknown $key
      * @param unknown $time
      */
-    public function exprieAt($key,$time)
+    public function exprieAt( $key, $time )
     {
-        return $this->redis->expireAt($key,$time);
+        return $this->redis->expireAt($key, $time);
     }
 
     /**
@@ -774,18 +770,17 @@ class Redis
      */
     public static function closeAll()
     {
-        foreach(static::$_instance as $o)
-        {
-            if($o instanceof self)
+        foreach (static::$_instance as $o) {
+            if ($o instanceof self)
                 $o->close();
         }
     }
 
     /** 这里不关闭连接，因为session写入会在所有对象销毁之后。
-    public function __destruct()
-    {
-    return $this->redis->close();
-    }
+     * public function __destruct()
+     * {
+     * return $this->redis->close();
+     * }
      **/
     /**
      * 返回当前数据库key数量
@@ -833,9 +828,9 @@ class Redis
     public function getConnInfo()
     {
         return array(
-            'host'=>$this->host,
-            'port'=>$this->port,
-            'auth'=>$this->auth
+            'host' => $this->host,
+            'port' => $this->port,
+            'auth' => $this->auth
         );
     }
     /*********************事务的相关方法************************/
@@ -846,7 +841,7 @@ class Redis
      * 可以重新取得Key的值。
      * @param unknown $key
      */
-    public function watch($key)
+    public function watch( $key )
     {
         return $this->redis->watch($key);
     }
@@ -866,7 +861,7 @@ class Redis
      * 默认是Redis::MULTI模式，
      * Redis::PIPELINE管道模式速度更快，但没有任何保证原子性有可能造成数据的丢失
      */
-    public function multi($type=\Redis::MULTI)
+    public function multi( $type = \Redis::MULTI )
     {
         return $this->redis->multi($type);
     }
@@ -898,7 +893,7 @@ class Redis
         return $this->redis->ping();
     }
 
-    public function auth($auth)
+    public function auth( $auth )
     {
         return $this->redis->auth($auth);
     }
@@ -909,19 +904,18 @@ class Redis
      * @param unknown $prefix
      * @param unknown $ids
      */
-    public function hashAll($prefix,$ids)
+    public function hashAll( $prefix, $ids )
     {
-        if($ids==false)
+        if ($ids == false)
             return false;
-        if(is_string($ids))
-            $ids=explode(',', $ids);
-        $arr=array();
-        foreach($ids as $id)
-        {
-            $key=$prefix.'.'.$id;
-            $res=$this->hGetAll($key);
-            if($res!=false)
-                $arr[]=$res;
+        if (is_string($ids))
+            $ids = explode(',', $ids);
+        $arr = array();
+        foreach ($ids as $id) {
+            $key = $prefix . '.' . $id;
+            $res = $this->hGetAll($key);
+            if ($res != false)
+                $arr[] = $res;
         }
 
         return $arr;
@@ -931,12 +925,12 @@ class Redis
      * 生成一条消息，放在redis数据库中。使用0号库。
      * @param string|array $msg
      */
-    public function pushMessage($lkey,$msg)
+    public function pushMessage( $lkey, $msg )
     {
-        if(is_array($msg)){
-            $msg    =    json_encode($msg);
+        if (is_array($msg)) {
+            $msg = json_encode($msg);
         }
-        $key    =    md5($msg);
+        $key = md5($msg);
 
         //如果消息已经存在，删除旧消息，已当前消息为准
         //echo $n=$this->lRem($lkey, 0, $key)."\n";
@@ -952,10 +946,10 @@ class Redis
      * @param unknown $keys
      * @param unknown $dbId
      */
-    public function delKeys($keys,$dbId)
+    public function delKeys( $keys, $dbId )
     {
-        $redisInfo=$this->getConnInfo();
-        $cmdArr=array(
+        $redisInfo = $this->getConnInfo();
+        $cmdArr = array(
             'redis-cli',
             '-a',
             $redisInfo['auth'],
@@ -966,8 +960,8 @@ class Redis
             '-n',
             $dbId,
         );
-        $redisStr=implode(' ', $cmdArr);
-        $cmd="{$redisStr} KEYS \"{$keys}\" | xargs {$redisStr} del";
+        $redisStr = implode(' ', $cmdArr);
+        $cmd = "{$redisStr} KEYS \"{$keys}\" | xargs {$redisStr} del";
         return $cmd;
     }
 }
