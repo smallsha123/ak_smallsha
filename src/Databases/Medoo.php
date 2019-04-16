@@ -30,9 +30,9 @@ class Medoo
 
 	protected $guid = 0;
 
-	public function __construct($options = null)
+	public function __construct($database_type = null,$database_name =null,$server =null,$username =null,$password =null,$charset =null)
 	{
-
+	    $options = compact('database_type','database_name','server','username','password','charset');
         if (!is_array($options))
 		{
 			return false;
@@ -52,6 +52,7 @@ class Medoo
 		{
 			$this->option = $options[ 'option' ];
 		}
+
 
 		if (isset($options[ 'logging' ]) && is_bool($options[ 'logging' ]))
 		{

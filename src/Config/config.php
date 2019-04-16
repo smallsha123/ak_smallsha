@@ -19,10 +19,9 @@ return [
 
     'components' => [
         //数据库操作
-//        'Medoo' => [
-//            'class' => 'Smallsha/Classes/Medoo'
-//        ],
-//
+        'Medoo' => [
+            'class' => 'Smallsha/Classes/Medoo'
+        ],
         'Pay' => [
             'class' => 'Smallsha\Classes\Pay'
         ],
@@ -33,8 +32,8 @@ return [
             'class' => 'Smallsha\Databases\Medoo',
             'constructor'=> [
                 'database_type' => 'mysql',
-                'database_name' => 'name',
-                'server' => 'localhost',
+                'database_name' => 'bags',
+                'server' => '127.0.0.1',
                 'username' => 'root',
                 'password' => 'root',
                 'charset' => 'utf8'

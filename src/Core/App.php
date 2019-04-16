@@ -12,7 +12,7 @@
 namespace Smallsha\Core;
 
 use Smallsha\Core\Small;
-
+use Smallsha\Core\Env;
 use Smallsha\Core\Application;
 
 class App extends \Smallsha\Core\Component {
@@ -29,6 +29,11 @@ class App extends \Smallsha\Core\Component {
      */
     public $params = null;
 
+    /*
+     * 插件
+     * */
+    public $plugins = null;
+
 	/**
 	 * __construct
 	 * @param $config 应用层配置
@@ -40,12 +45,12 @@ class App extends \Smallsha\Core\Component {
 		$this->config = Small::$appConfig = $config;
 		$this->params = Small::$params = $params;
 		try{
+            $this->plugins = \Smallsha\Classes\PluginManager::getInstance(); //加载插件
             parent::creatObject();   //加载组件
-            Application::setApp($this);  //注册组件
             static::bootstrap(); //初始化钩子函数
-            // Event 将事件抽象出来
+            Application::setApp($this);  //添加到注册树上
         }catch (\Smallsha\Core\SmallshaException $e){
-		    throw $e;
+            exit($e->getMessage());
         }
 	}
 
@@ -60,8 +65,9 @@ class App extends \Smallsha\Core\Component {
             error_reporting(0);
         }
         ini_set('date.timezone','Asia/Shanghai'); //设置时区
-        new \Smallsha\Classes\PluginManager(); //加载插件
-        return true;
+        //TODO 钩子加载
+        $envObj = new Env();
+        $envObj->load(SMROOT . 'Config/.env');
     }
 
 

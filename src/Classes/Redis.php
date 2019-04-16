@@ -1,6 +1,8 @@
 <?php
 
 namespace Smallsha\Classes;
+use Smallsha\Core\SmallshaException;
+
 /**
  * redis操作类
  * 说明，任何为false的串，存在redis中都是空串。
@@ -69,6 +71,7 @@ class Redis
      */
     public static function getInstance( $config, $attr = array() )
     {
+        throw  new SmallshaException('是白');
         //如果是一个字符串，将其认为是数据库的ID号。以简化写法。
         if (!is_array($attr)) {
             $dbId = $attr;

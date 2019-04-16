@@ -1,5 +1,54 @@
 <?php
 
+
+if(!function_exists('getSmApp')){
+    function getSmApp(){
+        return \Smallsha\Core\Application::getApp();
+    }
+}
+//是否开启组件模式 类似于yii中的component  建议在框架开始引入
+function startComponent( $config = [], $params = [] )
+{
+    $isFile = __DIR__ . '/src/Config/Bootstrap.php';
+    if (is_file($isFile)) {
+        require_once $isFile;
+
+        if (is_callable(array('Bootstrap', 'getInstance'))) {
+            try{
+                call_user_func_array(array('Bootstrap', 'getInstance'), [$config, $params]);
+            }catch (\Smallsha\Core\SmallshaException $e){
+                throw $e;
+            }
+        } else {
+            trigger_error('This method getInstance is not defined in the current class.');
+        }
+    }
+}
+
+//开启debug
+if (!function_exists('startDebugMode')) {
+    function startDebugMode()
+    {
+        if (!class_exists('\Whoops\Run')) {
+            trigger_error('shell carr composer require filp/whoops');
+        } else {
+            $whoops = new \Whoops\Run;
+            $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler);
+            $whoops->register();
+        }
+    }
+}
+
+/*
+ * 开启插件模式
+ * */
+function startPluginsMode()
+{
+    $obj = \Smallsha\Classes\PluginManager::getInstance();
+    return $obj;
+}
+
+
 //判断应用是否是手机
 if (!function_exists('is_mobile_request')) {
     function is_mobile_request()
@@ -97,8 +146,8 @@ function isIdentity( $id )
 
 }
 
-if(!function_exists('check_data')){
-    function check_data($data, $rule = NULL, $ext = NULL)
+if (!function_exists('check_data')) {
+    function check_data( $data, $rule = NULL, $ext = NULL )
     {
         $data = trim(str_replace(PHP_EOL, '', $data));
 
@@ -148,8 +197,9 @@ if(!function_exists('check_data')){
     }
 }
 
-if(!function_exists('shuffle_assoc')){
-    function shuffle_assoc($list) {
+if (!function_exists('shuffle_assoc')) {
+    function shuffle_assoc( $list )
+    {
         if (!is_array($list)) return $list;
         $keys = array_keys($list);
         shuffle($keys);
@@ -235,23 +285,6 @@ function read_static_cache( $cache_name )
     }
 }
 
-//是否开启组件模式 类似于yii中的component  建议在框架开始引入
-function startComponent( $config = [], $params = [] )
-{
-    $isFile = __DIR__ . '/src/Config/Bootstrap.php';
-    if (is_file($isFile)) {
-        require_once $isFile;
-
-        if (is_callable(array('Bootstrap', 'getInstance'))) {
-            call_user_func_array(array('Bootstrap', 'getInstance'), [$config, $params]);
-            return true;
-        } else {
-            trigger_error('This method getInstance is not defined in the current class.');
-        }
-    }
-
-}
-
 
 //此方法作用弥补工具类中不支持prs-4的类,按需加载文件
 function choose_bind_func( $filename = '', $is_all = false )
@@ -292,29 +325,33 @@ function getAkFunc()
 }
 
 //获取系统钩子方法
-function get_active_plugins()
-{
-    $Plugin_dir = __DIR__ . '/src/Plugins';
-    if (is_dir($Plugin_dir)) {
-        $handle = opendir($Plugin_dir);
-        if (!empty($handle)) {
-            while ($dir = readdir($handle)) {
-                $files[] = $dir;
+if (!function_exists('get_active_plugins')) {
+    function get_active_plugins()
+    {
+        $Plugin_dir = __DIR__ . '/src/Plugins';
+        if (is_dir($Plugin_dir)) {
+            $handle = opendir($Plugin_dir);
+            if (!empty($handle)) {
+                while ($dir = readdir($handle)) {
+                    $files[] = $dir;
+                }
             }
+            $files = array_values(array_diff($files, ['.', '..']));
+            if (!empty($files)) {
+                for ($i = 0; $i < count($files);) {
+                    $arr[$i]['name'] = $files[$i] . '_actions';
+                    $arr[$i]['directory'] = $files[$i];
+                    $i++;
+                }
+                return [$Plugin_dir, $arr];
+            } else {
+                trigger_error('暂时还没有插件');
+            }
+        } else {
+            trigger_error('不是有效目录');
         }
-        $files = array_values(array_diff($files, ['.', '..']));
-
-        for ($i = 0; $i < count($files);) {
-            $arr[$i]['name'] = $files[$i] . '_actions';
-            $arr[$i]['directory'] = $files[$i];
-            $i++;
-        }
-        return [$Plugin_dir, $arr];
-    } else {
-        trigger_error('不是有效目录');
     }
 }
-
 
 /**********************************请求方法判断********************************************/
 
@@ -720,7 +757,7 @@ if (!function_exists('generate_rand_string')) {
             // $password .= substr($chars, mt_rand(0, strlen($chars) – 1), 1);
             $password .= $chars[mt_rand(0, strlen($chars) - 1)];
         }
-        return date('Y-m-d H:i', get_time()) . $password;
+        return $password;
     }
 
 }
@@ -804,8 +841,6 @@ function sm_request( $url, $data = null )
         $header = substr($output, 0, $headerSize);
         $body = substr($output, $headerSize);
     }
-    //var_dump(curl_error($curl));
-
     curl_close($curl);
     return $output;
 }
