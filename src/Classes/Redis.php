@@ -48,7 +48,7 @@ class Redis
         $this->redis = new \Redis();
         $this->port = isset($config['port']) ? $config['port'] : 6379;
         $this->host = $config['host'];
-        $this->redis->connect($this->host, $this->port, $this->attr['timeout'] ?? 300);
+        $this->redis->connect($this->host, $this->port, $this->attr['timeout']);
 
 
         if (isset($config['auth'])) {
@@ -77,7 +77,6 @@ class Redis
         }
 
         $attr['db_id'] = isset($attr['db_id']) ? $attr['db_id'] : 0;
-
 
         $k = md5(implode('', $config) . $attr['db_id']);
         if (!isset(static::$_instance[$k]) || !(static::$_instance[$k] instanceof self)) {
@@ -115,6 +114,16 @@ class Redis
         return $this->redis;
     }
 
+
+    public function subscribe( $channels, $callback )
+    {
+        return $this->redis->subscribe($channels, $callback);
+    }
+
+    public function publish( $channels, $message )
+    {
+        return $this->redis->publish($channels, $message);
+    }
     /*****************hash表操作函数*******************/
 
     /**
@@ -225,7 +234,7 @@ class Redis
      * @param string $value
      * @return bool
      */
-    public function hIncrBy( $key, $field, $value )
+        public function hIncrBy( $key, $field, $value )
     {
         $value = intval($value);
         return $this->redis->hIncrBy($key, $field, $value);
@@ -364,6 +373,11 @@ class Redis
     public function zCount( $key, $start, $end )
     {
         return $this->redis->zCount($key, $start, $end);
+    }
+
+    public function zInter( $key, $start )
+    {
+        return $this->redis->zInter($key, $start);
     }
 
     /**
