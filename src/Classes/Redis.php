@@ -1,6 +1,7 @@
 <?php
 
 namespace Smallsha\Classes;
+
 use Smallsha\Core\SmallshaException;
 
 /**
@@ -237,7 +238,7 @@ class Redis
      * @param string $value
      * @return bool
      */
-        public function hIncrBy( $key, $field, $value )
+    public function hIncrBy( $key, $field, $value )
     {
         $value = intval($value);
         return $this->redis->hIncrBy($key, $field, $value);
@@ -982,3 +983,24 @@ class Redis
         return $cmd;
     }
 }
+
+/*
+ * 订阅系统
+ */
+//init_set('default_socket_timeout',-1);
+//$strChannel = 'Test_bihu_channel';
+//推送消息
+//$redis->publish($strChannel, "来自{$strChannel}频道的推送");
+//echo "---- {$strChannel} ---- 频道消息推送成功～ <br/>";
+//$redis->close();
+////订阅
+//echo "---- 订阅{$strChannel}这个频道，等待消息推送...----  <br/><br/>";
+//$redis->subscribe([$strChannel], 'callBackFun');
+//function callBackFun( $redis, $channel, $msg )
+//{
+//    print_r([
+//        'redis' => $redis,
+//        'channel' => $channel,
+//        'msg' => $msg
+//    ]);
+//}
