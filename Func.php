@@ -1,5 +1,18 @@
 <?php
 
+//获取当天是否是节假日
+//正常工作日对应结果为 0, 法定节假日对应结果为 1, 节假日调休补班对应的结果为 2，休息日对应结果为 3
+//节假日数据说明：本接口包含2017年起的中国法定节假日数据，数据来源国务院发布的公告，每年更新1次，确保数据最新
+if(!function_exists('getFlagHoliday')){
+    function getFlagHoliday(){
+        $date = date("Ymd",time());
+        $url = "http://api.goseek.cn/Tools/holiday?date=".$date;
+        $res = file_get_contents($url);    //json格式，前端需要直接提供
+        $res = json_decode($res,true);   //数组格式，方便后端判断
+        return $res;
+    }
+}
+
 if (!function_exists('getSmApp')) {
     function getSmApp()
     {
