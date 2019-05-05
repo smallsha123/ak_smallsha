@@ -1,6 +1,7 @@
 <?php
 
 
+
 if(!function_exists('getSmApp')){
     function getSmApp(){
         return \Smallsha\Core\Application::getApp();
