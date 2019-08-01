@@ -1,14 +1,33 @@
 <?php
 
+
+
+//格式化时间戳
+if (!function_exists('getTimeFormt')) {
+
+    function getTimeFormt($time, $type = 0)
+    {
+        if ($type == 0) $f = "m-d H:i";
+        else if ($type == 1) $f = "Y-m-d H:i";
+        else if ($type == 3) $f = "m-d H:i";
+        else if ($type == 4) $f = "H:i:s";
+        else if ($type == 5) $f = "Y-m-d";
+        else if ($type == 6) $f = "H:i:s";
+        else if ($type == 7) $f = "Y-m-d H:i:s";
+        return date($f, $time);
+    }
+}
+
 //获取当天是否是节假日
 //正常工作日对应结果为 0, 法定节假日对应结果为 1, 节假日调休补班对应的结果为 2，休息日对应结果为 3
 //节假日数据说明：本接口包含2017年起的中国法定节假日数据，数据来源国务院发布的公告，每年更新1次，确保数据最新
-if(!function_exists('getFlagHoliday')){
-    function getFlagHoliday(){
-        $date = date("Ymd",time());
-        $url = "http://api.goseek.cn/Tools/holiday?date=".$date;
+if (!function_exists('getFlagHoliday')) {
+    function getFlagHoliday()
+    {
+        $date = date("Ymd", time());
+        $url = "http://api.goseek.cn/Tools/holiday?date=" . $date;
         $res = file_get_contents($url);    //json格式，前端需要直接提供
-        $res = json_decode($res,true);   //数组格式，方便后端判断
+        $res = json_decode($res, true);   //数组格式，方便后端判断
         return $res;
     }
 }
@@ -20,7 +39,7 @@ if (!function_exists('getSmApp')) {
     }
 }
 //是否开启组件模式 类似于yii中的component  建议在框架开始引入
-function startComponent( $config = [], $params = [] )
+function startComponent($config = [], $params = [])
 {
     $isFile = __DIR__ . '/src/Config/Bootstrap.php';
     if (is_file($isFile)) {
@@ -107,7 +126,7 @@ if (!function_exists('is_mobile_request')) {
 }
 
 /*判断是否是身份证号码1*/
-function isIdentity( $id )
+function isIdentity($id)
 {
     $id = strtoupper($id);
     $regx = "/(^\d{15}$)|(^\d{17}([0-9]|X)$)/";
@@ -160,7 +179,7 @@ function isIdentity( $id )
 }
 
 if (!function_exists('check_data')) {
-    function check_data( $data, $rule = NULL, $ext = NULL )
+    function check_data($data, $rule = NULL, $ext = NULL)
     {
         $data = trim(str_replace(PHP_EOL, '', $data));
 
@@ -211,7 +230,7 @@ if (!function_exists('check_data')) {
 }
 
 if (!function_exists('shuffle_assoc')) {
-    function shuffle_assoc( $list )
+    function shuffle_assoc($list)
     {
         if (!is_array($list)) return $list;
         $keys = array_keys($list);
@@ -224,7 +243,7 @@ if (!function_exists('shuffle_assoc')) {
 }
 
 if (!function_exists('sm')) {
-    function sm( $var )
+    function sm($var)
     {
         echo "<pre>";
         print_r($var);
@@ -233,7 +252,7 @@ if (!function_exists('sm')) {
 }
 
 if (!function_exists('check_arr')) {
-    function check_arr( $rs )
+    function check_arr($rs)
     {
         {
             foreach ($rs as $v) {
@@ -265,7 +284,7 @@ if (!function_exists('check_arr')) {
  *  *
  *  * @return
  *  */
-function write_static_cache( $cache_name, $caches )
+function write_static_cache($cache_name, $caches)
 {
     $cache_file_path = __DIR__ . '/src/Asset/static_caches/' . md5($cache_name) . '.php';
     $content = "<?php\r\n";
@@ -282,7 +301,7 @@ function write_static_cache( $cache_name, $caches )
  *
  * @return array  $data
  */
-function read_static_cache( $cache_name )
+function read_static_cache($cache_name)
 {
     static $result = array();
     if (!empty($result[$cache_name])) {
@@ -300,7 +319,7 @@ function read_static_cache( $cache_name )
 
 
 //此方法作用弥补工具类中不支持prs-4的类,按需加载文件
-function choose_bind_func( $filename = '', $is_all = false )
+function choose_bind_func($filename = '', $is_all = false)
 {
     $rest_dir = __DIR__ . '/src/Function';
     if ($is_all) {
@@ -414,7 +433,7 @@ if (!function_exists('isPost')) {
  */
 if (!function_exists('arraySequence')) {
 
-    function arraySequence( $array, $field, $sort = 'SORT_ASC' )
+    function arraySequence($array, $field, $sort = 'SORT_ASC')
     {
         $arrSort = array();
         foreach ($array as $uniqid => $row) {
@@ -432,7 +451,7 @@ if (!function_exists('arraySequence')) {
  * */
 
 if (!function_exists('remove_duplicate')) {
-    function remove_duplicate( $array )
+    function remove_duplicate($array)
     {
         $result = array();
         foreach ($array as $key => $value) {
@@ -456,7 +475,7 @@ if (!function_exists('remove_duplicate')) {
  * @return int
  */
 if (!function_exists('jsonArray')) {
-    function jsonArray( $to )
+    function jsonArray($to)
     {
         if (gettype($to) == 'array') {
             return $a = json_decode(json_encode($to));
@@ -471,7 +490,7 @@ if (!function_exists('jsonArray')) {
  * @return int
  */
 if (!function_exists('baseSerialize')) {
-    function baseSerialize( $to )
+    function baseSerialize($to)
     {
         if (gettype($to) == 'array') {
             return base64_encode(serialize($to));
@@ -507,7 +526,7 @@ if (!function_exists('baseSerialize')) {
  * @return array
  */
 if (!function_exists('BubbleSort')) {
-    function BubbleSort( array $container )
+    function BubbleSort(array $container)
     {
         $count = count($container);
 
@@ -551,7 +570,7 @@ if (!function_exists('BubbleSort')) {
  * @return array
  */
 if (!function_exists('InsertSort')) {
-    function InsertSort( array $container )
+    function InsertSort(array $container)
     {
         $count = count($container);
         for ($i = 1; $i < $count; $i++) {
@@ -593,7 +612,7 @@ if (!function_exists('InsertSort')) {
  * @return array
  */
 if (!function_exists('QuickSort')) {
-    function QuickSort( array $container )
+    function QuickSort(array $container)
     {
         $count = count($container);
         if ($count <= 1) { // 基线条件为空或者只包含一个元素，只需要原样返回数组
@@ -616,7 +635,7 @@ if (!function_exists('QuickSort')) {
 }
 
 if (!function_exists('xml_to_array')) {
-    function xml_to_array( $data )
+    function xml_to_array($data)
     {
         $data = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
         return json_decode(json_encode($data), true);
@@ -625,11 +644,11 @@ if (!function_exists('xml_to_array')) {
 
 /**
  * 将xml转为array
- * @param  string $xml xml字符串或者xml文件名
- * @param  bool $isfile 传入的是否是xml文件名
+ * @param string $xml xml字符串或者xml文件名
+ * @param bool $isfile 传入的是否是xml文件名
  * @return array    转换得到的数组
  */
-function xml_array( $xml, $isfile = false )
+function xml_array($xml, $isfile = false)
 {
     //禁止引用外部xml实体
     libxml_disable_entity_loader(true);
@@ -649,7 +668,7 @@ function xml_array( $xml, $isfile = false )
  * @param is_dep false 针对的是浅层数组  true 针对深层数组
  * */
 if (!function_exists('array_xml')) {
-    function array_xml( $data, $is_dep = false )
+    function array_xml($data, $is_dep = false)
     {
         if (!is_array($data)) {
             return false;
@@ -676,7 +695,7 @@ if (!function_exists('array_xml')) {
  * 深层array转xml
  * */
 if (!function_exists('arr2xml')) {
-    function arr2xml( $data, $root = true )
+    function arr2xml($data, $root = true)
     {
         $str = "";
         if ($root) $str .= "<xml>";
@@ -703,7 +722,7 @@ if (!function_exists('arr2xml')) {
  * @param string $scale 精度 默认为小数点后两位
  * @return  string
  */
-function ncPriceCalculate( $n1, $symbol, $n2, $scale = '2' )
+function ncPriceCalculate($n1, $symbol, $n2, $scale = '2')
 {
     $res = "";
     switch ($symbol) {
@@ -734,7 +753,7 @@ function ncPriceCalculate( $n1, $symbol, $n2, $scale = '2' )
  * @param $price 金额
  * @return int
  */
-function ncPriceYuan2fen( $price )
+function ncPriceYuan2fen($price)
 {
     $price = (int)ncPriceCalculate(100, "*", ncPriceFormat($price));
     return $price;
@@ -746,7 +765,7 @@ function ncPriceYuan2fen( $price )
  * @param int $price
  * @return string    $price_format
  */
-function ncPriceFormat( $price )
+function ncPriceFormat($price)
 {
     $price_format = number_format($price, 2, '.', '');
     return $price_format;
@@ -758,7 +777,7 @@ function ncPriceFormat( $price )
  * 获取随机字符串  用于生成订单号
  * */
 if (!function_exists('generate_rand_string')) {
-    function generate_rand_string( $length = 8 )
+    function generate_rand_string($length = 8)
     {
         // 密码字符集，可任意添加你需要的字符
         $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -797,7 +816,7 @@ if (!function_exists('randcol')) {
  * */
 if (!function_exists('random')) {
 
-    function random( $length, $numeric = FALSE )
+    function random($length, $numeric = FALSE)
     {
 
         $seed = base_convert(md5(microtime() . $_SERVER['DOCUMENT_ROOT']), 16, $numeric ? 10 : 35);
@@ -831,7 +850,7 @@ if (!function_exists('random')) {
 
 
 //https请求(支持GET和POST)   如果当前方法不能满足需求可以调用choose_bind_func('smRequest') 加载Request类
-function sm_request( $url, $data = null )
+function sm_request($url, $data = null)
 {
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_URL, $url);
@@ -861,7 +880,7 @@ function sm_request( $url, $data = null )
 
 if (!function_exists('mkdirs')) {
     //防止直接传入文件路径创建不成功
-    function mkdirs( $path )
+    function mkdirs($path)
     {
 
         if (!is_dir($path)) {
@@ -878,7 +897,7 @@ if (!function_exists('mkdirs')) {
 
 if (!function_exists('file_copy')) {
 
-    function file_copy( $src, $des, $filter )
+    function file_copy($src, $des, $filter)
     {
 
         $dir = opendir($src);
@@ -915,7 +934,7 @@ if (!function_exists('file_copy')) {
 
 if (!function_exists('rmdirs')) {
     //删除目录
-    function rmdirs( $path, $clean = false )
+    function rmdirs($path, $clean = false)
     {
 
         if (!is_dir($path)) {
@@ -983,7 +1002,7 @@ if (!function_exists('getips')) {
 
 if (!function_exists('get_time')) {
     //获取系统时间 优于time()
-    function get_time( $is_format = false )
+    function get_time($is_format = false)
     {
         return $is_format ? date('Y-m-d H:i:s', $_SERVER['REQUEST_TIME']) : $_SERVER['REQUEST_TIME'];
     }
@@ -991,7 +1010,7 @@ if (!function_exists('get_time')) {
 
 
 if (!function_exists('timeFromNow')) {
-    function timeFromNow( $dateline )
+    function timeFromNow($dateline)
     {
         if (empty($dateline)) return false;
         $seconds = time() - $dateline;
@@ -1013,7 +1032,7 @@ if (!function_exists('timeFromNow')) {
  * 获取视频源url
  * */
 if (!function_exists('get_url_video')) {
-    function get_url_video( $video )
+    function get_url_video($video)
     {
         $vid = trim(strrchr($video, '/'), '/');
         $vid = substr($vid, 0, -5);
@@ -1036,16 +1055,16 @@ if (!function_exists('get_url_video')) {
 
 /**
  * 计算两点地理坐标之间的距离
- * @param  float $longitude1 起点经度
- * @param  float $latitude1 起点纬度
- * @param  float $longitude2 终点经度
- * @param  float $latitude2 终点纬度
- * @param  Int $unit 单位 1:米 2:公里
- * @param  Int $decimal 精度 保留小数位数
+ * @param float $longitude1 起点经度
+ * @param float $latitude1 起点纬度
+ * @param float $longitude2 终点经度
+ * @param float $latitude2 终点纬度
+ * @param Int $unit 单位 1:米 2:公里
+ * @param Int $decimal 精度 保留小数位数
  * @return float
  */
 if (!function_exists('getDistance')) {
-    function getDistance( $longitude1, $latitude1, $longitude2, $latitude2, $unit = 2, $decimal = 2 )
+    function getDistance($longitude1, $latitude1, $longitude2, $latitude2, $unit = 2, $decimal = 2)
     {
         $EARTH_RADIUS = 6370.996; // 地球半径系数
         $PI = 3.1415926;
@@ -1095,7 +1114,7 @@ if (!function_exists('msectime')) {
  * @return array
  */
 if (!function_exists('list_sort_by')) {
-    function list_sort_by( $list, $field, $sortby = 'asc' )
+    function list_sort_by($list, $field, $sortby = 'asc')
     {
         if (is_array($list)) {
             $refer = $resultSet = array();
