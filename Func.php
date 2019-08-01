@@ -202,6 +202,7 @@ if (!function_exists('check_data')) {
         $validate['moble'] = '/^(((1[0-9][0-9]{1})|159|153)+\\d{8})$/';
         $validate['password'] = '/^[a-zA-Z0-9]{6,16}$/';
         $validate['xnb'] = '/^[a-zA-Z]$/';
+        $validate['bank'] = '/^([1-9]{1})(\d{14}|\d{18})$/';
 
         if (isset($validate[strtolower($rule)])) {
             $rule = $validate[strtolower($rule)];
