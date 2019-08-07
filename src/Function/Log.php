@@ -3,7 +3,6 @@
  * [WeEngine System] Copyright (c) 2014 WE7.CC
  * WeEngine is NOT a free software, it under the license terms, visited http://www.we7.cc/ for more details.
  */
-
 define('LOGGING_ERROR', 'error');
 define('LOGGING_TRACE', 'trace');
 define('LOGGING_WARNING', 'warning');
@@ -13,21 +12,16 @@ if(!function_exists('logging_run')){
     function logging_run($log, $type = 'trace', $filename = 'run') {
         global $_W;
         $filename = SM_ROOT  . $filename . '_' . date('Ymd') . '.log';
-
         mkdirs(dirname($filename));
-
         $logFormat = "%date %type %user %url %context";
-
         if (!empty($GLOBALS['_POST'])) {
             $context[] = logging_implode($GLOBALS['_POST']);
         }
-
         if (is_array($log)) {
             $context[] = logging_implode($log);
         } else {
             $context[] = preg_replace('/[ \t\r\n]+/', ' ', $log);
         }
-
         $log = str_replace(explode(' ', $logFormat), array(
             '[' . date('Y-m-d H:i:s', $_W['timestamp']) . ']',
             $type,
@@ -35,11 +29,9 @@ if(!function_exists('logging_run')){
             $_SERVER["PHP_SELF"] . "?" . $_SERVER["QUERY_STRING"],
             implode("\n", $context),
         ), $logFormat);
-
         file_put_contents($filename, $log . "\r\n", FILE_APPEND);
         return true;
     }
-
     function logging_implode($array, $skip = array()) {
         $return = '';
         if (is_array($array) && !empty($array)) {

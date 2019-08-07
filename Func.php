@@ -1,7 +1,6 @@
 <?php
 
 
-
 //格式化时间戳
 if (!function_exists('getTimeFormt')) {
 
@@ -175,8 +174,29 @@ function isIdentity($id)
             }
         }
     }
-
 }
+
+/**
+ * 简易验证
+ * @param $rule
+ * @param $data
+ * @return array
+ */
+if (!function_exists('check_data')) {
+    function easy_validate($rule, $data)
+    {
+        $tmp = array();
+        foreach ($rule as $k => $v) {
+            if (!isset($data[$k]) || empty($data[$k])) {
+                return $v;
+            }
+
+            $tmp[$k] = $data[$k];
+        }
+        return $tmp;
+    }
+}
+
 
 if (!function_exists('check_data')) {
     function check_data($data, $rule = NULL, $ext = NULL)

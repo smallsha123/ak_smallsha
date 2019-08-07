@@ -4,9 +4,7 @@
  * User: static7 <static7@qq.com>
  * Date: 2018/4/29 18:29
  */
-
 namespace  Smallsha\Classes;
-
 class Kdniao
 {
     /**
@@ -290,7 +288,6 @@ class Kdniao
         if ($this->analyze($result)===false){
             return false;
         };
-
         return $this->getExpressInfo();
     }
     /**
@@ -375,7 +372,6 @@ class Kdniao
      * @return mixed
      */
     private function analyze(string $json)
-
     {
         $object = json_decode($json,true);
         if ($object['Success'] === false) {
@@ -396,8 +392,6 @@ class Kdniao
         return $this->error;
     }
 }
-
-
 //使用
 //
 //$config = [

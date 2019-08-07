@@ -15,19 +15,16 @@ class Tree
      * @var string
      */
     private static $primary = 'id';
-
     /**
      * 父键名称
      * @var string
      */
     private static $parentId = 'parent_id';
-
     /**
      * 子节点名称
      * @var string
      */
     private static $child    = 'child';
-
     /**
      * 修改主键名称、父键名称、子节点名称
      * @param string $primary
@@ -39,7 +36,6 @@ class Tree
         if(!empty($parentId)) self::$parentId = $parentId;
         if(!empty($child))    self::$child    = $child;
     }
-
     /**
      * 生成Tree
      * @param array $data
@@ -65,7 +61,6 @@ class Tree
         unset($v);
         return $childs;
     }
-
     /**
      * 查找子类
      * @param array $data

@@ -1,20 +1,15 @@
 <?php
 namespace  Smallsha\Classes;
-
-
 class MiniApp {
     const WXLOGIN = "https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code";
-
     private $appid;
     private $secret;
     private $code;
     private $url;
-
     private $sessionkey;
     /**
      * error code 说明.
      * <ul>
-
      *    <li>-41001: encodingAesKey 非法</li>
      *    <li>-41003: aes 解密失败</li>
      *    <li>-41004: 解密后得到的buffer非法</li>
@@ -27,31 +22,23 @@ class MiniApp {
     public static $IllegalIv = -41002;
     public static $IllegalBuffer = -41003;
     public static $DecodeBase64Error = -41004;
-
     public function __construct($appid,$secret)
     {
         $this->appid = $appid;
         $this->secret = $secret;
     }
-
-
     public function setCode($code){
         $this->code = $code;
         return $this;
     }
-
-
     public function getSessionKey(){
         $this->url = sprintf(self::WXLOGIN,$this->appid,$this->secret,$this->code);
         $result = sm_request($this->url);
         return json_decode($result,true);
     }
-
-
     public function setSessionKey($sessionkey){
         $this->sessionKey  = $sessionkey;
     }
-
     public function getToken(){
         $v = 1;
         $key = mt_rand();
@@ -59,8 +46,6 @@ class MiniApp {
         $token = str_replace('=', '', strtr(base64_encode($hash), '+/', '-_'));
         return $token;
     }
-
-
     /**
      * 检验数据的真实性，并且获取解密后的明文.
      * @param $encryptedData string 加密的用户数据
@@ -75,17 +60,12 @@ class MiniApp {
             return static::$IllegalAesKey;
         }
         $aesKey=base64_decode($this->sessionKey);
-
-
         if (strlen($iv) != 24) {
             return static::$IllegalIv;
         }
         $aesIV=base64_decode($iv);
-
         $aesCipher=base64_decode($encryptedData);
-
         $result=openssl_decrypt( $aesCipher, "AES-128-CBC", $aesKey, 1, $aesIV);
-
         $dataObj=json_decode( $result );
         if( $dataObj  == NULL )
         {
@@ -98,8 +78,4 @@ class MiniApp {
         $data = $result;
         return static::$OK;
     }
-
-
-
-
 }

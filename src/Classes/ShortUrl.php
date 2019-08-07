@@ -1,6 +1,5 @@
 <?php
 namespace  Smallsha\Classes;
-
 /*
  * 生成新浪的短链接或还原新浪短链接
  */

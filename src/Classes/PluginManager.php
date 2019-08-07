@@ -1,9 +1,6 @@
 <?php
-
 namespace Smallsha\Classes;
-
 use  Smallsha\Core\Small;
-
 /**
  *
  * 插件机制的实现核心类
@@ -18,7 +15,6 @@ class PluginManager
      */
     private $_listeners = array();
     static $instance;
-
     /**
      * 构造函数
      *
@@ -49,12 +45,10 @@ class PluginManager
         }
         #此处做些日志记录方面的东西
     }
-
     private function __clone()
     {
         // TODO: Implement __clone() method.
     }
-
     public static function getInstance()
     {
         if (self::$instance == null) {
@@ -62,7 +56,6 @@ class PluginManager
         }
         return self::$instance;
     }
-
     /**
      * 注册需要监听的插件方法（钩子）
      *
@@ -78,7 +71,6 @@ class PluginManager
         $this->_listeners[$hook][$key] = array(&$reference, $method);
         #此处做些日志记录方面的东西
     }
-
     /**
      * 触发一个钩子
      *

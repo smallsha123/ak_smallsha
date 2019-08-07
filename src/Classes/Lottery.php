@@ -1,10 +1,7 @@
 <?php
 namespace  Smallsha\Classes;
-
-
 class Lottery
 {
-
     public $dataList;
     public $wining_key;
     public $pushData = [];
@@ -23,7 +20,6 @@ class Lottery
         }
         $this->dataList = $arr;
     }
-
     //抽奖算法
     public function getDataRand()
     {
@@ -43,8 +39,5 @@ class Lottery
         $this->pushData['fail_key'] = array_keys($this->dataList);
         return $this->pushData;
     }
-
 }
-
 ?>
-

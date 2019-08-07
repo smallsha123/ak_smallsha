@@ -1,8 +1,5 @@
 <?php
 namespace  Smallsha\Classes;
-
-
-
 class Captcha {
 	public $maxAngle = 15; 
 	public $maxOffset = 5; 
@@ -114,7 +111,6 @@ class Captcha {
 					$nY = $Y;
 				}
 				$nY = $nY + $scale * sin($phase + $nX * 0.2);
-
 				$p = $this->interpolate(
 					$nX - floor($nX),
 					$nY - floor($nY),
@@ -182,15 +178,9 @@ class Captcha {
 	}
 }
 ?>
-
 <!--使用
-
-
 use Smallsha\Classes\Captcha;
-
-
 session_start();
-
 $captcha = new Captcha();
 $captcha->build(150, 40);
 $hash = md5(strtolower($captcha->phrase));
