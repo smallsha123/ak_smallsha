@@ -1,6 +1,6 @@
 {
     "name": "ak_smallsha/application",
-    "description": "smallsha first application package",
+    "description": "ak_smallsha Toolkit",
     "type": "library",
     "license": "MIT",
     "minimum-stability": "dev",

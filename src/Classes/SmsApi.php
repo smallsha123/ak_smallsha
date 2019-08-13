@@ -287,5 +287,4 @@ function sendMobileMessage($mobile, $content, $template_id = 0)
     }
 }
 /************************************************/
-
 ?>
