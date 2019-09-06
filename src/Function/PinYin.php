@@ -2,14 +2,14 @@
 //获取汉子的首字符大写
 function get_letter( $string )
 {
-    $charlist = mb_str_split($string);
+    $charlist = mb_str_splitc($string);
     $res = [];
     foreach ($charlist as $v) {
         $res[] = getfirstchar($v);
     }
     return implode('', $res);
 }
-function mb_str_split( $string )
+function mb_str_splitc( $string )
 {
     return preg_split('/(?<!^)(?!$)/u', $string);
 }

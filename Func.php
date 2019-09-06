@@ -794,25 +794,45 @@ function ncPriceFormat($price)
 
 
 /**********************************工具方法********************************************/
-/*
- * 获取随机字符串  用于生成订单号
- * */
-if (!function_exists('generate_rand_string')) {
-    function generate_rand_string($length = 8)
+if (!function_exists('generate_rand_str')) {
+    /**
+     * 生成随机字符串
+     * @param int $length 生成长度
+     * @param int $type 生成类型：0-小写字母+数字，1-小写字母，2-大写字母，3-数字，4-小写+大写字母，5-小写+大写+数字
+     * @return string
+     */
+    function generate_rand_str($length = 8, $type = 0)
     {
-        // 密码字符集，可任意添加你需要的字符
-        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        $password = '';
-        for ($i = 0; $i < $length; $i++) {
-            // 这里提供两种字符获取方式
-            // 第一种是使用 substr 截取$chars中的任意一位字符；
-            // 第二种是取字符数组 $chars 的任意元素
-            // $password .= substr($chars, mt_rand(0, strlen($chars) – 1), 1);
-            $password .= $chars[mt_rand(0, strlen($chars) - 1)];
-        }
-        return $password;
-    }
+        $a = 'abcdefghijklmnopqrstuvwxyz';
+        $A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $n = '0123456789';
 
+        switch ($type) {
+            case 1:
+                $chars = $a;
+                break;
+            case 2:
+                $chars = $A;
+                break;
+            case 3:
+                $chars = $n;
+                break;
+            case 4:
+                $chars = $a . $A;
+                break;
+            case 5:
+                $chars = $a . $A . $n;
+                break;
+            default:
+                $chars = $a . $n;
+        }
+
+        $str = '';
+        for ($i = 0; $i < $length; $i++) {
+            $str .= $chars[mt_rand(0, strlen($chars) - 1)];
+        }
+        return $str;
+    }
 }
 
 /*
@@ -1219,6 +1239,65 @@ if (!function_exists('export_mysql_txt')) {
             file_put_contents($file_name, $info, FILE_APPEND);
         }
         echo "数据备份完成！";
+    }
+}
+
+if (!function_exists("arrangeTime")) {
+    /**
+     * 返回本年、本周、本月、本日的开始和结束时间的时间戳
+     *
+     * @return array
+     */
+    function arrangeTime($type)
+    {
+        switch ($type) {
+            case 'month':
+                $y = date("Y", time());
+                $m = date("m", time());
+                $d = date("d", time());
+                $t0 = date('t');                   // 本月一共有几天
+                $d0 = mktime(0, 0, 0, $m, 1, $y);       // 创建本月开始时间
+                $d1 = mktime(23, 59, 59, $m, $t0, $y);  // 创建本月结束时间
+                break;
+            case 'week':
+                $w = date("w", time());   //这天是星期几
+                $d0 = mktime(0, 0, 0, date("m"), date("d") - $w, date("Y"));       //创建周开始时间
+                $d1 = mktime(23, 59, 59, date("m"), date("d") - $w + 6, date("Y"));//创建周结束时间
+                break;
+            case 'day':
+                $d0 = mktime(0, 0, 0, date("m"), date("d"), date("Y"));   //创建日开始时间
+                $d1 = mktime(23, 59, 59, date("m"), date("d"), date("Y"));//创建日结束时间
+                break;
+            case 'year':
+                $d0 = strtotime(date("Y", time()) . "-1" . "-1"); //本年开始
+                $d1 = strtotime(date("Y", time()) . "-12" . "-31"); //本年结束
+                break;
+        }
+        return array($d0, $d1);
+    }
+}
+
+if(!function_exists('filterNotExistChildren')){
+    /**
+     * 根据指定字段查$arr2里，不存在于$arr1中的数组
+     *
+     * @param $field string 指定筛选字段
+     * @param $arr1 array 老数组
+     * @param $arr2 array 新数组
+     * @return array 数组差
+     */
+    function filterNotExistChildren($arr1 = [], $arr2 = [], $field)
+    {
+        $return = [];
+        if (empty($field)) return $return;
+        $oldArray = array_reduce($arr1, function ($carry = [], $item) use ($field) {
+            $carry[] = $item[$field];
+            return $carry;
+        });
+        $return = array_filter($arr2, function ($item) use ($oldArray) {
+            return !in_array($item['code'], $oldArray);
+        });
+        return $return;
     }
 }
 
